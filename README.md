@@ -11,3 +11,23 @@
 - [파트1 (1~6)] (https://www.youtube.com/playlist?list=PLrDd_kMiAuNmSb-CKWQqq9oBFN_KNMTaI)
 
 - [파트2 (7~끝)] (https://www.youtube.com/playlist?list=PLrDd_kMiAuNmllp9vuPqCuttC1XL9VyVh)
+
+## Done
+
+**1장 불 논리 Boolean Logic**
+
+- [x] Not
+- [x] And
+- [x] Or
+- [ ] Xor
+- [ ] Mux
+- [ ] DMux
+- [ ] Not16
+- [ ] And16
+- [ ] Or16
+- [ ] Mux16
+- [ ] Or8Way
+- [ ] Mux4Way16
+- [ ] Mux8Way16
+- [ ] DMux4way
+- [ ] DMux8Way
