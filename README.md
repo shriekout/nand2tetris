@@ -5,13 +5,6 @@
 원제: "The Elements of Computing Systems" by Noam Nisan and Shimon Schocken
 
 공식 웹사이트: https://www.nand2tetris.org/
-
-**강의영상**
-
-- [파트1 (1~6)] (https://www.youtube.com/playlist?list=PLrDd_kMiAuNmSb-CKWQqq9oBFN_KNMTaI)
-
-- [파트2 (7~끝)] (https://www.youtube.com/playlist?list=PLrDd_kMiAuNmllp9vuPqCuttC1XL9VyVh)
-
 ___
 
 ## Done
@@ -33,3 +26,12 @@ ___
 - [x] Mux8Way16
 - [x] DMux4way
 - [x] DMux8Way
+
+**2장 불 연산**
+
+- [ ] HalfAdder
+- [ ] FullAdder
+- [ ] Add16
+- [ ] Inc16
+- [ ] ALU
+
