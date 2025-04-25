@@ -29,9 +29,9 @@ ___
 
 **2장 불 연산**
 
-- [ ] HalfAdder
-- [ ] FullAdder
-- [ ] Add16
-- [ ] Inc16
+- [x] HalfAdder
+- [x] FullAdder
+- [x] Add16
+- [x] Inc16
 - [ ] ALU
 
