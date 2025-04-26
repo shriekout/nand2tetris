@@ -41,7 +41,7 @@ ___
 - [x] Register
 - [x] RAM8
 - [x] RAM64
-- [ ] RAM512
-- [ ] RAM4K
-- [ ] RAM16K
-- [ ] PC
+- [x] RAM512
+- [x] RAM4K
+- [x] RAM16K
+- [x] PC
