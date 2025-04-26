@@ -37,10 +37,10 @@ ___
 
 **3장 메모리**
 
-- [ ] Bit
-- [ ] Register
-- [ ] RAM8
-- [ ] RAM64
+- [x] Bit
+- [x] Register
+- [x] RAM8
+- [x] RAM64
 - [ ] RAM512
 - [ ] RAM4K
 - [ ] RAM16K
