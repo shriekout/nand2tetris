@@ -35,3 +35,14 @@ ___
 - [x] Inc16
 - [x] ALU
 
+**3장 메모리**
+
+- [ ] Bit
+- [ ] PC
+- [ ] Register
+- [ ] RAM8
+- [ ] RAM64
+- [ ] RAM512
+- [ ] RAM4K
+- [ ] RAM16K
+
