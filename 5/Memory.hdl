@@ -25,5 +25,32 @@ CHIP Memory {
     OUT out[16];
 
     PARTS:
-	//// Replace this comment with your code.
+    DMux4Way(in=load, sel=address[13..14], 
+            a=loadRam0, b=loadRam1, c=loadDis, d=loadKey);
+    Or(a=loadRam0, b=loadRam1, out=loadRam);
+	
+    RAM16K(in=in, load=loadRam, address=address[0..13], out=outRam);
+    Screen(in=in, load=loadDis, address=address[0..12], out=outDis);
+    Keyboard(out=outKey);
+
+    Mux4Way16(a=outRam, b=outRam, c=outDis, d=outKey, 
+            sel=address[13..14], out=out);
 }
+
+// 2진수 16비트 주소 (118쪽)
+// RAM16K:  
+//      start:  0000000000000000
+//      end:    0011111111111111
+// Screen:
+//      start:  0100000000000000
+//      end:    0101111111111111
+// Keyboard:    0110000000000000
+
+// 상위 14, 13비트
+// RAM16K:  
+//      start:  00
+//      end:    01
+// Screen:
+//      start:  10
+//      end:    10
+// Keyboard:    11
