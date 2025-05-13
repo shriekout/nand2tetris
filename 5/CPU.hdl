@@ -32,5 +32,65 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-	//// Replace this comment with your code.
+    Not(in=instruction[15], out=notIns);
+	Mux16(a=outMM, b=instruction, sel=notIns, out=out1);
+    Or(a=notIns, b=instruction[5], out=out2);
+    ARegister(in=out1, load=out2, out[0..14]=addressM, out=ad);
+    Mux16(a=ad, b=inM, sel=instruction[12], out=out3);
+    DRegister(in=outMM, load=instruction[4], out=outD);
+    ALU(x=outD, y=out3, 
+        zx=instruction[11], nx=instruction[10], zy=instruction[9], 
+        ny=instruction[8], f=instruction[7], no=instruction[6], 
+        out=outM, zr=zr, ng=ng,
+        out=outMM);
+
+    And(a=instruction[15], b=instruction[3], out=writeM);
+
+    Not(in=ng, out=pos);
+    Not(in=zr, out=nzr);
+
+    And(a=pos, b=nzr, out=JGT);
+    And(a=JGT, b=instruction[15], out=jgt);
+
+    And(a=zr, b=instruction[15], out=jeq);
+
+//    Or(a=jgt, b=jeq, out=JGE);
+//    And(a=JGE, b=instruction[15], out=jge);
+
+    And(a=nzr, b=ng, out=JLT);
+    And(a=JLT, b=instruction[15], out=jlt);
+
+//    And(a=nzr, b=instruction[15], out=jne);
+
+//    Or(a=jne, b=jeq, out=JLE);
+//    And(a=JLE, b=instruction[15], out=jle);
+
+    // 조건부 점프
+    And(a=instruction[0], b=jgt, out=cond0);   // JGT
+    And(a=instruction[1], b=jeq, out=cond1);   // JEQ
+    And(a=instruction[2], b=jlt, out=cond2);   // JLT
+
+    // 무조건 점프 JMP: instruction[2:0] == 111
+    And(a=instruction[0], b=instruction[1], out=t1);
+    And(a=t1, b=instruction[2], out=t2);
+    And(a=t2, b=instruction[15], out=cond3);   // JMP
+
+    // load = cond0 | cond1 | cond2 | cond3
+    Or(a=cond0, b=cond1, out=t3);
+    Or(a=t3, b=cond2, out=t4);
+    Or(a=t4, b=cond3, out=loadPC);
+
+    // inc = not load
+    Not(in=loadPC, out=incPC);
+    
+    PC(in=ad, load=loadPC, inc=incPC, reset=reset, out[0..14]=pc);
 }
+
+// null    000
+// JGT     001     v > 0
+// JEQ     010     v == 0
+// JGE     011     v >= 0
+// JLT     100     v < 0
+// JNE     101     v != 0
+// JLE     110     v <= 0
+// JMP     111
