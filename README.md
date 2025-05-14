@@ -8,9 +8,9 @@
 ___
 
 ## Done
-
-**1장 불 논리 Boolean Logic**
-
+<details>
+  <summary>1장 불 논리</summary>
+  
 - [x] Not
 - [x] And
 - [x] Or
@@ -27,7 +27,10 @@ ___
 - [x] DMux4way
 - [x] DMux8Way
 
-**2장 불 연산**
+</details>
+
+<details>
+  <summary>2장 불 연산</summary>
 
 - [x] HalfAdder
 - [x] FullAdder
@@ -35,8 +38,11 @@ ___
 - [x] Inc16
 - [x] ALU
 
-**3장 메모리**
+</details>
 
+<details>
+  <summary>3장 메모리</summary>
+  
 - [x] Bit
 - [x] Register
 - [x] RAM8
@@ -46,7 +52,22 @@ ___
 - [x] RAM16K
 - [x] PC
 
-**4장 기계어**
+</details>
 
+<details>
+  <summary>4장 기계어</summary>
+  
 - [x] mult (곱셈 프로그램)
 - [x] fill (I/O 처리 프로그램)
+
+</details>
+
+
+<details>
+  <summary>5장 컴퓨터 아키텍처</summary>
+
+- [x] Memory
+- [x] CPU
+- [x] Computer 
+
+</details>
