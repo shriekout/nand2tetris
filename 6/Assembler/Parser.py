@@ -43,12 +43,6 @@ class Parser:
         else:
             return None
         
-    def dest(self):
-        if (self.instructionType() == C_COMMAND and '=' in self.current_command):
-            return self.current_command.split('=')[0]
-        else:
-            return None
-        
     def comp(self):
         if self.instructionType() != C_COMMAND:
             return None
@@ -62,6 +56,12 @@ class Parser:
             comp_part = comp_part.split(';')[0]
             
         return comp_part
+    
+    def dest(self):
+        if (self.instructionType() == C_COMMAND and '=' in self.current_command):
+            return self.current_command.split('=')[0]
+        else:
+            return None
         
     def jump(self):
         if (self.instructionType() == C_COMMAND and ';' in self.current_command):
