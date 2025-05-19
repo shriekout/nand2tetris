@@ -71,3 +71,13 @@ ___
 - [x] Computer 
 
 </details>
+
+<details>
+  <summary>6장 어셈블러</summary>
+
+- [x] Parser
+- [x] Code
+- [ ] Symbol Table
+- [ ] Assember
+
+</details>
