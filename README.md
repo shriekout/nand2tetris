@@ -77,7 +77,7 @@ ___
 
 - [x] Parser
 - [x] Code
-- [ ] Symbol Table
+- [x] Symbol Table
 - [ ] Assember
 
 </details>
