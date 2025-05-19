@@ -33,7 +33,7 @@ CHIP CPU {
 
     PARTS:
     Not(in=instruction[15], out=notIns);
-	Mux16(a=outMM, b=instruction, sel=notIns, out=out1);
+    Mux16(a=outMM, b=instruction, sel=notIns, out=out1);
     Or(a=notIns, b=instruction[5], out=out2);
     ARegister(in=out1, load=out2, out[0..14]=addressM, out=ad);
     Mux16(a=ad, b=inM, sel=instruction[12], out=out3);
