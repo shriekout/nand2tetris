@@ -17,7 +17,7 @@ class Parser:
             self.current_index = -1
             self.current_command = None
         except  FileNotFoundError:
-            print("File not Found.")
+            print(f"File '{file}' not Found.")
             sys.exit()
             
     def hasMoreLines(self):
@@ -69,6 +69,10 @@ class Parser:
         else:
             return None
         
+    def reset(self):
+        self.current_index = -1
+        self.current_command = None
+
     def print_lines(self):
         while self.hasMoreLines():
             self.advance()
