@@ -9,3 +9,48 @@
 // the screen should be cleared.
 
 //// Replace this comment with your code.
+
+(RESTART)
+    // set position
+    @SCREEN
+    D=A
+    @addr
+    M=D
+    // is pressed?
+    @KBD
+    D=M
+    @WHITE
+    D;JEQ
+
+(BLACK)
+    @color
+    M=-1
+    @PAINTIT
+    0;JMP
+
+(WHITE)
+    @color
+    M=0
+    @PAINTIT
+    0;JMP
+
+(PAINTIT)
+    @addr
+    D=M
+    @KBD
+    D=A-D
+    @RESTART
+    D;JEQ
+    @color
+    D=M
+    @addr
+    A=M
+    M=D
+    @addr
+    M=M+1
+    @PAINTIT
+    0;JMP
+
+(END)
+    @END
+    0;JMP
