@@ -26,6 +26,9 @@ CHIP Memory {
 
     PARTS:
 	//// Replace this comment with your code.
+    // RAM16K   00~01   14~13bit
+    // SCREEN   10~10
+    // KEYBOARD 11
     DMux(in=load, sel=address[14], a=w0, b=w1);
     RAM16K(in=in, load=w0, address=address[0..13], out=wr);
     DMux(in=w1, sel=address[13], a=w2, b=w3);
