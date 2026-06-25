@@ -38,8 +38,9 @@ CHIP Memory {
         c=scrout, d=kbout, 
         sel=address[13..14], out=out);
 }
-// 0000     RAM16k start
-// 0011     RAM16k end
-// 0100     Screen start
-// 0101     Screen end
-// 0110     Keyboard
+// address[14..13]
+//00 RAM16k start
+//00 RAM16k end
+//10 Screen start
+//10 Screen end
+//11 Keyboard
