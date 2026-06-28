@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -MMD -MP
 TARGET = HackAssembler
 
-SRCS = main.c symboltable.c assembler.c parser.c code.c test.c
+SRCS = main.c symboltable.c assembler.c parser.c code.c
 OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 

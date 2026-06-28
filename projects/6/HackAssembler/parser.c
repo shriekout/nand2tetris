@@ -1,6 +1,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
+
 #include "parser.h"
 
 void removeWhitespace(char *buf)
@@ -74,4 +75,43 @@ int isNumber(const char *s)
     }
 
     return 1;
+}
+
+void extractComp(const char *buf, char *buf2)
+{
+    char *eq = strchr(buf, '=');
+    char *sc = strchr(buf, ';');
+
+    if (eq != NULL && sc != NULL) {
+        strncpy(buf2, eq+1, sc-eq-1);
+        buf2[sc-eq-1] = '\0';
+    } else if (eq != NULL && sc == NULL) {
+        strcpy(buf2, eq+1);
+    } else {
+        strncpy(buf2, buf, sc-buf);
+        buf2[sc-buf] = '\0';
+    }
+}
+
+void extractDest(const char *buf, char *buf2)
+{
+    char *eq = strchr(buf, '=');
+
+    if (eq != NULL) {
+        strncpy(buf2, buf, eq-buf);
+        buf2[eq-buf] = '\0';
+    } else {
+        buf2[0] = '\0';
+    }
+}
+
+void extractJump(const char *buf, char *buf2)
+{
+    char *sc = strchr(buf, ';');
+
+    if (sc != NULL) {
+        strcpy(buf2, sc+1);
+    } else {
+        buf2[0] = '\0';
+    }
 }

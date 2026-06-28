@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "config.h"
 #include "assembler.h"
 #include "parser.h"
@@ -64,15 +65,25 @@ void secondPass(FILE *fin, FILE *fout)
 
                 break;
             case C_INSTRUCTION:
-                strcpy(tmp2, "testC");
+                strcpy(tmp2, "111");
+
+                extractComp(buf, tmp);
+                strcat(tmp2, compBits(tmp));
+                
+                extractDest(buf, tmp);
+                strcat(tmp2, destBits(tmp));
+                
+                extractJump(buf, tmp);
+                strcat(tmp2, jumpBits(tmp));
+                
                 break;
             case L_INSTRUCTION:
-                strcpy(tmp2, "testL");
+                continue;
                 break;
             default:
                 break;
         }
 
-        printf("%s\t%s\n", buf, tmp2);
+        fprintf(fout, "%s\n", tmp2);
     }
 }
