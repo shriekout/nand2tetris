@@ -62,3 +62,9 @@ int getAddress(const char *symbol)
     fprintf(stderr, "Undefined symbol: %s\n", symbol);
     exit(1);
 }
+
+void printSymbol(void)
+{
+    for (int i = 0; i < symbolCount; i++)
+        printf("%s\t%d\n", symbolTable[i].symbol, symbolTable[i].address);
+}

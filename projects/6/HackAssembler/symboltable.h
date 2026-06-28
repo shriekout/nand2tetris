@@ -12,5 +12,6 @@ void initSymbolTable(void);
 void addSymbol(const char*, int);
 int containsSymbol(const char*);
 int getAddress(const char*);
+void printSymbol(void);
 
 #endif

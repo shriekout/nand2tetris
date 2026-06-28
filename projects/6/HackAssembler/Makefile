@@ -1,18 +1,18 @@
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -MMD -MP
 TARGET = HackAssembler
 
-SRCS = main.c symboltable.c
+SRCS = main.c symboltable.c assembler.c parser.c code.c test.c
 OBJS = $(SRCS:.c=.o)
+DEPS = $(OBJS:.o=.d)
 
 $(TARGET): $(OBJS)
 	$(CC) $(CFLAGS) -o $@ $^
 
-main.o: main.c config.h symboltable.h
-symboltable.o: symboltable.c config.h symboltable.h
-
 %.o: %.c
 	$(CC) $(CFLAGS) -c $<
 
+-include $(DEPS)
+
 clean:
-	rm -f $(TARGET) $(OBJS)
+	rm -f $(TARGET) $(OBJS) $(DEPS)
