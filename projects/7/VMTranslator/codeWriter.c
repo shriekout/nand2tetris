@@ -5,40 +5,84 @@
 #include "codeWriter.h"
 #include "config.h"
 
-// Initialize
-// @256
-// D=A
-// @SP
-// M=D
+static int labelCount = 0;
+
+// Refer to the sand file.
 void Initialize(FILE *fout)
 {
-    char code[] = "@256\n"
-                    "D=A\n"
-                    "@SP\n"
-                    "M=D\n";
-
-    fprintf(fout, "%s", code);
+    fprintf(fout, 
+            "@256\n"
+            "D=A\n"
+            "@SP\n"
+            "M=D\n");
 }
 
-void writeArithmetic(const char *cmd)
+// Refer to the sand file.
+void writeArithmetic(FILE *fout, const char *cmd)
 {
-    printf("add\n");
+    const char *jump;
+
+    if (!strcmp(cmd, "add")) {
+        fprintf(fout,
+                "@SP\n"
+                "AM=M-1\n"
+                "D=M\n"
+                "A=A-1\n"
+                "M=M+D\n");
+    } else if (!strcmp(cmd, "sub")) {
+        fprintf(fout,
+                "@SP\n"
+                "AM=M-1\n"
+                "D=M\n"
+                "A=A-1\n"
+                "M=M-D\n");
+
+    } else if (!strcmp(cmd, "neg")) {
+        fprintf(fout,
+                "@SP\n"
+                "A=M-1\n"
+                "M=-M\n");
+    } else if (!strcmp(cmd, "eq") 
+                || !strcmp(cmd, "gt") 
+                || !strcmp(cmd, "lt")) {
+        int id = labelCount++;
+
+        if (!strcmp(cmd, "eq"))
+            jump = "JEQ";
+        else if (!strcmp(cmd, "gt"))
+            jump = "JGT";
+        else if (!strcmp(cmd, "lt"))
+            jump = "JLT";
+
+        fprintf(fout, 
+                "@SP\n"
+                "AM=M-1\n"
+                "D=M\n"
+                "A=A-1\n"
+                "D=M-D\n"
+                "@TRUE%d\n"
+                "D;%s\n"
+                "@SP\n"
+                "A=M\n"
+                "M=0\n"
+                "@END%d\n"
+                "0;JMP\n"
+                "(TRUE%d)\n"
+                "@SP\n"
+                "A=M\n"
+                "M=-1\n"
+                "(END%d)\n"
+                "@SP\n"
+                "M=M+1\n",
+                id, jump, id, id, id);
+    }
 }
 
-// push constant 7
-// @7
-// D=A
-// @SP
-// A=M
-// M=D
-// @SP
-// M=M+1
+// Refer to the sand file.
 void codePush(FILE *fout, const char *seg, const int idx)
 {
-    char buf[BUF_MAX];
-
     if (!strcmp(seg, "constant")) {
-        snprintf(buf, sizeof(buf),
+        fprintf(fout, 
                 "@%d\n"
                 "D=A\n"
                 "@SP\n"
@@ -48,10 +92,9 @@ void codePush(FILE *fout, const char *seg, const int idx)
                 "M=M+1\n", 
                 idx);
     }
-
-    fprintf(fout, "%s", buf);
 }
 
+// Refer to the sand file.
 void writePop(const char *seg, const int idx)
 {
 

@@ -1,14 +1,62 @@
-// Initialize
+// Initialize   /////////////////////
 @256
 D=A
 @SP
 M=D
 
-// push constant 7
+// push constant 7  ///////////////////
 @7
 D=A
 @SP
 A=M
 M=D
+@SP
+M=M+1
+
+// add  //////////////////////////////
+@SP
+AM=M-1
+D=M
+A=A-1
+M=M+D
+
+// sub  ////////////////////////////
+@SP
+AM=M-1
+D=M
+A=A-1
+M=M-D
+
+// neg  ////////////////////////////
+@SP
+A=M-1
+M=-M
+
+// eq   //////////////////////////
+// y pop
+@SP
+AM=M-1
+D=M
+
+// x - y
+A=A-1
+D=M-D
+
+@TRUE
+D;JEQ
+
+// FALSE
+@SP
+A=M
+M=0
+@END
+0;JMP
+
+(TRUE)
+@SP
+A=M
+M=-1
+
+(END)
 @SP
 M=M+1
