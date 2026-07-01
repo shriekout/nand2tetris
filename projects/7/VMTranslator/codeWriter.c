@@ -109,6 +109,50 @@ void writePush(FILE *fout, const char *seg, const int idx)
 // Refer to the sand file.
 void writePop(FILE *fout, const char *seg, const int idx)
 {
-    fprintf(stderr, "Unknown push segment: %s\n", seg);
-    exit(EXIT_FAILURE);
+    const char *buf;
+
+    if (!strcmp(seg, "local") || !strcmp(seg, "argument")
+        || !strcmp(seg, "this") || !strcmp(seg, "that")) {
+        if (!strcmp(seg, "local"))
+            buf = "LCL";
+        else if (!strcmp(seg, "argument"))
+            buf = "ARG";
+        else if (!strcmp(seg, "this"))
+            buf = "THIS";
+        else if (!strcmp(seg, "that"))
+            buf = "THAT";
+
+        fprintf(fout, 
+                "@%s\n"
+                "D=M\n"
+                "@%d\n"
+                "D=D+A\n"
+                "@R13\n"
+                "M=D\n"
+                "@SP\n"
+                "AM=M-1\n"
+                "D=M\n"
+                "@R13\n"
+                "A=M\n"
+                "M=D\n",
+                buf, idx);
+    } else if (!strcmp(seg, "temp")) {
+        fprintf(fout,
+                "@5\n"
+                "D=A\n"
+                "@%d\n"
+                "D=D+A\n"
+                "@R13\n"
+                "M=D\n"
+                "@SP\n"
+                "AM=M-1\n"
+                "D=M\n"
+                "@R13\n"
+                "A=M\n"
+                "M=D\n",
+                idx);
+    } else {
+        fprintf(stderr, "Unknown pop segment: %s\n", seg);
+        exit(EXIT_FAILURE);
+    }
 }
