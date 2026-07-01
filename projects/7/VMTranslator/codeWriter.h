@@ -7,7 +7,7 @@
 
 void Initialize(FILE*);
 void writeArithmetic(FILE *, const char*);
-void codePush(FILE*, const char*, const int);
-void writePop(const char*, const int);
+void writePush(FILE*, const char*, const int);
+void writePop(FILE*, const char*, const int);
 
 #endif

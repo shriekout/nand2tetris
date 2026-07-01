@@ -13,26 +13,24 @@ M=D
 @SP
 M=M+1
 
-// add  //////////////////////////////
+// add sub and or //////////////////////////////
 @SP
 AM=M-1
 D=M
 A=A-1
-M=M+D
-
-// sub  ////////////////////////////
-@SP
-AM=M-1
-D=M
-A=A-1
-M=M-D
+M=M+D   // M=M-D sub ; M=M&D and ; M=M|D or
 
 // neg  ////////////////////////////
 @SP
 A=M-1
 M=-M
 
-// eq   //////////////////////////
+// not  ///////////////////////////////
+@SP
+A=M-1
+M=!M
+
+// eq gt lt  //////////////////////////
 // y pop
 @SP
 AM=M-1
@@ -43,20 +41,18 @@ A=A-1
 D=M-D
 
 @TRUE
-D;JEQ
+D;JEQ   // JGT ; JLT
 
 // FALSE
 @SP
-A=M
+A=M-1
 M=0
 @END
 0;JMP
 
 (TRUE)
 @SP
-A=M
+A=M-1
 M=-1
 
 (END)
-@SP
-M=M+1

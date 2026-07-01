@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "parser.h"
 #include "codeWriter.h"
@@ -20,39 +21,46 @@ void Initialize(FILE *fout)
 // Refer to the sand file.
 void writeArithmetic(FILE *fout, const char *cmd)
 {
-    const char *jump;
+    const char *buf;
 
-    if (!strcmp(cmd, "add")) {
+    if (!strcmp(cmd, "add") || !strcmp(cmd, "sub")
+        || !strcmp(cmd, "and") || !strcmp(cmd, "or")) {
+        if (!strcmp(cmd, "add"))
+            buf = "M=M+D";
+        else if (!strcmp(cmd, "sub"))
+            buf = "M=M-D";
+        else if (!strcmp(cmd, "and"))
+            buf = "M=M&D";
+        else if (!strcmp(cmd, "or"))
+            buf = "M=M|D";
         fprintf(fout,
                 "@SP\n"
                 "AM=M-1\n"
                 "D=M\n"
                 "A=A-1\n"
-                "M=M+D\n");
-    } else if (!strcmp(cmd, "sub")) {
-        fprintf(fout,
-                "@SP\n"
-                "AM=M-1\n"
-                "D=M\n"
-                "A=A-1\n"
-                "M=M-D\n");
-
+                "%s\n",
+                buf);
     } else if (!strcmp(cmd, "neg")) {
         fprintf(fout,
                 "@SP\n"
                 "A=M-1\n"
                 "M=-M\n");
+    } else if (!strcmp(cmd, "not")) {
+        fprintf(fout,
+                "@SP\n"
+                "A=M-1\n"
+                "M=!M\n");
     } else if (!strcmp(cmd, "eq") 
                 || !strcmp(cmd, "gt") 
                 || !strcmp(cmd, "lt")) {
         int id = labelCount++;
 
         if (!strcmp(cmd, "eq"))
-            jump = "JEQ";
+            buf = "JEQ";
         else if (!strcmp(cmd, "gt"))
-            jump = "JGT";
+            buf = "JGT";
         else if (!strcmp(cmd, "lt"))
-            jump = "JLT";
+            buf = "JLT";
 
         fprintf(fout, 
                 "@SP\n"
@@ -63,23 +71,24 @@ void writeArithmetic(FILE *fout, const char *cmd)
                 "@TRUE%d\n"
                 "D;%s\n"
                 "@SP\n"
-                "A=M\n"
+                "A=M-1\n"
                 "M=0\n"
                 "@END%d\n"
                 "0;JMP\n"
                 "(TRUE%d)\n"
                 "@SP\n"
-                "A=M\n"
+                "A=M-1\n"
                 "M=-1\n"
-                "(END%d)\n"
-                "@SP\n"
-                "M=M+1\n",
-                id, jump, id, id, id);
+                "(END%d)\n",
+                id, buf, id, id, id);
+    } else {
+        fprintf(stderr, "Unknown Arithmetic command: %s\n", cmd);
+        exit(EXIT_FAILURE);
     }
 }
 
 // Refer to the sand file.
-void codePush(FILE *fout, const char *seg, const int idx)
+void writePush(FILE *fout, const char *seg, const int idx)
 {
     if (!strcmp(seg, "constant")) {
         fprintf(fout, 
@@ -91,11 +100,15 @@ void codePush(FILE *fout, const char *seg, const int idx)
                 "@SP\n"
                 "M=M+1\n", 
                 idx);
+    } else {
+        fprintf(stderr, "Unknown push segment: %s\n", seg);
+        exit(EXIT_FAILURE);
     }
 }
 
 // Refer to the sand file.
-void writePop(const char *seg, const int idx)
+void writePop(FILE *fout, const char *seg, const int idx)
 {
-
+    fprintf(stderr, "Unknown push segment: %s\n", seg);
+    exit(EXIT_FAILURE);
 }

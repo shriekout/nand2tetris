@@ -29,10 +29,10 @@ void parser(FILE *fin, FILE *fout)
             writeArithmetic(fout, cmd);
         else if (type == C_PUSH) {
             idx = atoi(arg2);
-            codePush(fout, arg1, idx);
+            writePush(fout, arg1, idx);
         } else if (type == C_POP) {
             idx = atoi(arg2);
-            writePop(arg1, idx);
+            writePop(fout, arg1, idx);
         }
     }
 }
