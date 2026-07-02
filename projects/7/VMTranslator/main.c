@@ -9,6 +9,8 @@
 #define EXTIN   ".vm"
 #define EXTOUT  ".asm"
 
+char g_filename[BUF_MAX];
+
 int main(int argc, char *argv[])
 {
     FILE *fin, *fout;
@@ -31,6 +33,14 @@ int main(int argc, char *argv[])
     }
 
     *ext = '\0';
+
+    char *base = strrchr(fnameout, '/');
+
+    if (base != NULL)
+        strcpy(g_filename, base+1);
+    else
+        strcpy(g_filename, fnameout);
+    
     strcat(fnameout, EXTOUT);
 
     if ((fin = fopen(fnamein, "r")) == NULL) {

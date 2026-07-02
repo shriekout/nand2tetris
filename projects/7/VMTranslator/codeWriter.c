@@ -138,6 +138,31 @@ void writePush(FILE *fout, const char *seg, const int idx)
                 "@SP\n"
                 "M=M+1\n",
                 idx);
+    } else if (!strcmp(seg, "pointer")) {
+        if (idx == 0)
+            buf = "THIS";
+        else if (idx == 1)
+            buf = "THAT";
+        
+        fprintf(fout,
+                "@%s\n"
+                "D=M\n"
+                "@SP\n"
+                "A=M\n"
+                "M=D\n"
+                "@SP\n"
+                "M=M+1\n",
+                buf);
+    } else if (!strcmp(seg, "static")) {
+        fprintf(fout,
+                "@%s.%d\n"
+                "D=M\n"
+                "@SP\n"
+                "A=M\n"
+                "M=D\n"
+                "@SP\n"
+                "M=M+1\n",
+                g_filename, idx);
     } else {
         fprintf(stderr, "Unknown push segment: %s\n", seg);
         exit(EXIT_FAILURE);
@@ -189,6 +214,27 @@ void writePop(FILE *fout, const char *seg, const int idx)
                 "A=M\n"
                 "M=D\n",
                 idx);
+    } else if (!strcmp(seg, "pointer")) {
+        if (idx == 0)
+            buf = "THIS";
+        else if (idx == 1)
+            buf = "THAT";
+
+        fprintf(fout,
+                "@SP\n"
+                "AM=M-1\n"
+                "D=M\n"
+                "@%s\n"
+                "M=D\n",
+                buf);
+    } else if (!strcmp(seg, "static")) {
+        fprintf(fout,
+                "@SP\n"
+                "AM=M-1\n"
+                "D=M\n"
+                "@%s.%d\n"
+                "M=D\n",
+                g_filename, idx);
     } else {
         fprintf(stderr, "Unknown pop segment: %s\n", seg);
         exit(EXIT_FAILURE);

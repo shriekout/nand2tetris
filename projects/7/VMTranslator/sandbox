@@ -81,6 +81,23 @@ M=D
 @SP
 M=M+1
 
+// push pointer 0 (1) //////////////////////////////////
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+// push static 0 ///////////////////////////
+@fn.0
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
 
 // pop local 0  (argument ; this ; that) ////////////////////
 // 1. target address
@@ -114,4 +131,18 @@ D=M
 // 3. store
 @R13
 A=M
+M=D
+
+// pop pointer 0 (1) /////////////////////////////
+@SP
+AM=M-1
+D=M
+@THIS
+M=D
+
+// pop static 0 ///////////////////////////
+@SP
+AM=M-1
+D=M
+@fn.0
 M=D
