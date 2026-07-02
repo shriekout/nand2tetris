@@ -4,15 +4,6 @@ D=A
 @SP
 M=D
 
-// push constant 7  ///////////////////
-@7
-D=A
-@SP
-A=M
-M=D
-@SP
-M=M+1
-
 // add sub and or //////////////////////////////
 @SP
 AM=M-1
@@ -56,6 +47,40 @@ A=M-1
 M=-1
 
 (END)
+
+// push constant 7  ///////////////////
+@7
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+// push local 0 (argument ; this ; that) ///////////////////
+@0
+D=A
+@LCL
+A=M+D
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+//push temp 0 ///////////////////////////////
+@5
+D=A
+@0
+A=D+A
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
 
 // pop local 0  (argument ; this ; that) ////////////////////
 // 1. target address

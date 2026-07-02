@@ -90,6 +90,8 @@ void writeArithmetic(FILE *fout, const char *cmd)
 // Refer to the sand file.
 void writePush(FILE *fout, const char *seg, const int idx)
 {
+    const char *buf;
+
     if (!strcmp(seg, "constant")) {
         fprintf(fout, 
                 "@%d\n"
@@ -99,6 +101,42 @@ void writePush(FILE *fout, const char *seg, const int idx)
                 "M=D\n"
                 "@SP\n"
                 "M=M+1\n", 
+                idx);
+    } else if (!strcmp(seg, "local") || !strcmp(seg, "argument")
+                || !strcmp(seg, "this") || !strcmp(seg, "that")) { 
+        if (!strcmp(seg, "local"))
+            buf = "LCL";
+        else if (!strcmp(seg, "argument"))
+            buf = "ARG";
+        else if (!strcmp(seg, "this"))
+            buf = "THIS";
+        else if (!strcmp(seg, "that"))
+            buf = "THAT";
+
+        fprintf(fout,
+                "@%d\n"
+                "D=A\n"
+                "@%s\n"
+                "A=M+D\n"
+                "D=M\n"
+                "@SP\n"
+                "A=M\n"
+                "M=D\n"
+                "@SP\n"
+                "M=M+1\n",
+                idx, buf);
+    } else if (!strcmp(seg, "temp")) {
+        fprintf(fout,
+                "@5\n"
+                "D=A\n"
+                "@%d\n"
+                "A=D+A\n"
+                "D=M\n"
+                "@SP\n"
+                "A=M\n"
+                "M=D\n"
+                "@SP\n"
+                "M=M+1\n",
                 idx);
     } else {
         fprintf(stderr, "Unknown push segment: %s\n", seg);
