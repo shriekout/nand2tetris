@@ -11,22 +11,40 @@ This repository contains my solutions and implementations for the **Nand2Tetris*
 
 ### Part I – Hardware
 
-- [x] Chapter 1: Boolean Logic
-- [x] Chapter 2: Boolean Arithmetic
-- [x] Chapter 3: Memory
-- [x] Chapter 4: Machine Language
-- [x] Chapter 5: Computer Architecture
-- [x] Chapter 6: Assembler
+:white_check_mark: Chapter 1: Boolean Logic
+
+:white_check_mark: Chapter 2: Boolean Arithmetic
+
+:white_check_mark: Chapter 3: Memory
+
+:white_check_mark: Chapter 4: Machine Language
+
+:white_check_mark: Chapter 5: Computer Architecture
+
+:white_check_mark: Chapter 6: Assembler
 
 ### Part II – Software
 
-- [x] Chapter 7: Virtual Machine I – Stack Arithmetic
-- [ ] Chapter 8: Virtual Machine II – Program Control
-- [ ] Chapter 9: High-Level Language
-- [ ] Chapter 10: Compiler I – Syntax Analysis
-- [ ] Chapter 11: Compiler II – Code Generation
-- [ ] Chapter 12: Operating System
-- [ ] Chapter 13: Postscript
+:white_check_mark: Chapter 7: Virtual Machine I – Stack Arithmetic
+
+:construction: Chapter 8: Virtual Machine II – Program Control
+
+:hourglass_flowing_sand: Chapter 9: High-Level Language
+
+:hourglass_flowing_sand: Chapter 10: Compiler I – Syntax Analysis
+
+:hourglass_flowing_sand: Chapter 11: Compiler II – Code Generation
+
+:hourglass_flowing_sand: Chapter 12: Operating System
+
+:hourglass_flowing_sand: Chapter 13: Postscript
+
+:white_check_mark: Completed
+
+:construction: In progress
+
+:hourglass_flowing_sand: Planned
+
 
 ## Acknowledgements
 
