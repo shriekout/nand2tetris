@@ -143,6 +143,10 @@ void writePush(FILE *fout, const char *seg, const int idx)
             buf = "THIS";
         else if (idx == 1)
             buf = "THAT";
+        else {
+            fprintf(stderr, "Unknown pointer idx\n");
+            exit(1);
+        }
         
         fprintf(fout,
                 "@%s\n"
@@ -219,6 +223,10 @@ void writePop(FILE *fout, const char *seg, const int idx)
             buf = "THIS";
         else if (idx == 1)
             buf = "THAT";
+        else {
+            fprintf(stderr, "Unknown pointer idx\n");
+            exit(1);
+        }
 
         fprintf(fout,
                 "@SP\n"

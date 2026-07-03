@@ -1,3 +1,4 @@
 VMTranslator
-*.0
+*.o
 *.d
+sandbox

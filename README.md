@@ -28,11 +28,20 @@ This repository contains my solutions and implementations for the **Nand2Tetris*
 :hourglass_flowing_sand: Chapter 12: Operating System<br>
 :hourglass_flowing_sand: Chapter 13: More Fun to Go<br>
 
-## Legend
+### Legend
 
 :white_check_mark: Completed<br>
 :construction: In progress<br>
 :hourglass_flowing_sand: Planned<br>
+
+## Development Environment
+
+* Windows Subsystem for Linux (WSL)
+* Debian
+* GCC
+* Make
+* Git
+* Vs code
 
 ## Acknowledgements
 
