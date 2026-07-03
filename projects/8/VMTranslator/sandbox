@@ -1,0 +1,148 @@
+// Initialize   /////////////////////
+@256
+D=A
+@SP
+M=D
+
+// add sub and or //////////////////////////////
+@SP
+AM=M-1
+D=M
+A=A-1
+M=M+D   // M=M-D sub ; M=M&D and ; M=M|D or
+
+// neg  ////////////////////////////
+@SP
+A=M-1
+M=-M
+
+// not  ///////////////////////////////
+@SP
+A=M-1
+M=!M
+
+// eq gt lt  //////////////////////////
+// y pop
+@SP
+AM=M-1
+D=M
+
+// x - y
+A=A-1
+D=M-D
+
+@TRUE
+D;JEQ   // JGT ; JLT
+
+// FALSE
+@SP
+A=M-1
+M=0
+@END
+0;JMP
+
+(TRUE)
+@SP
+A=M-1
+M=-1
+
+(END)
+
+// push constant 7  ///////////////////
+@7
+D=A
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+// push local 0 (argument ; this ; that) ///////////////////
+@0
+D=A
+@LCL
+A=M+D
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+//push temp 0 ///////////////////////////////
+@5
+D=A
+@0
+A=D+A
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+// push pointer 0 (1) //////////////////////////////////
+@THIS
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+// push static 0 ///////////////////////////
+@fn.0
+D=M
+@SP
+A=M
+M=D
+@SP
+M=M+1
+
+// pop local 0  (argument ; this ; that) ////////////////////
+// 1. target address
+@LCL
+D=M
+@0
+D=D+A
+@R13
+M=D
+// 2. stack pop
+@SP
+AM=M-1
+D=M
+// 3. store
+@R13
+A=M
+M=D
+
+// pop temp 0 /////////////////////////
+// 1. destination = 5 + idx
+@5
+D=A
+@0
+D=D+A
+@R13
+M=D
+// 2. stack pop
+@SP
+AM=M-1
+D=M
+// 3. store
+@R13
+A=M
+M=D
+
+// pop pointer 0 (1) /////////////////////////////
+@SP
+AM=M-1
+D=M
+@THIS
+M=D
+
+// pop static 0 ///////////////////////////
+@SP
+AM=M-1
+D=M
+@fn.0
+M=D
