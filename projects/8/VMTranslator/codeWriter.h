@@ -5,7 +5,7 @@
 
 #include "parser.h"
 
-void Initialize(FILE*);
+void writeBootstrap(FILE*);
 void writeArithmetic(FILE *, const char*);
 void writePush(FILE*, const char*, const int);
 void writePop(FILE*, const char*, const int);

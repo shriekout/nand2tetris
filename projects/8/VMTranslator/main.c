@@ -54,6 +54,12 @@ int main(int argc, char *argv[])
 
             // choose ".vm"
             if (ext != NULL && !strcmp(ext, EXTIN)) {
+                if (fileCount >= BUF_MAX) {
+                    fprintf(stderr, "Too many VM files.\n");
+                    closedir(dir);
+                    return 1;
+                }
+
                 len = strlen(argv[1]);
 
                 if (len > 0 && argv[1][len-1] != '/')
@@ -75,7 +81,8 @@ int main(int argc, char *argv[])
         if (buf[len-1] == '/')
             buf[len-1] = '\0';
 
-        snprintf(fnameout, PATH_MAX, "%s%s", buf, EXTOUT);
+        strcat(buf, EXTOUT);
+        strcpy(fnameout, buf);
     } else if (S_ISREG(st.st_mode)) {
         strcpy(fnameout, argv[1]);
         ext = strrchr(fnameout, '.');
@@ -105,15 +112,15 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
+    if (S_ISDIR(st.st_mode))
+        writeBootstrap(fout);
+
     for (int i = 0; i < fileCount; i++) {
         if ((fin = fopen(fnamein[i], "r")) == NULL) {
             perror(fnamein[i]);
             fclose(fout);
             exit(1);
         }
-
-        if (i == 0)
-            Initialize(fout);
 
         setFileName(fnamein[i]);
 
