@@ -41,7 +41,7 @@ This repository contains my solutions and implementations for the **Nand2Tetris*
 * GCC
 * Make
 * Git
-* Vs code
+* VS code
 
 ## Acknowledgements
 
