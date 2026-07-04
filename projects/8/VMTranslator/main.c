@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <dirent.h>
+#include <linux/limits.h>
 
 #include "config.h"
 #include "parser.h"
@@ -11,20 +12,21 @@
 #define EXTIN   ".vm"
 #define EXTOUT  ".asm"
 
-static void setFileName(char *);
+static void setFileName(const char *);
 
-char g_filename[BUF_MAX];
+char g_filename[PATH_MAX];
 
 int main(int argc, char *argv[])
 {
-    // FILE *fin, *fout;
-    // 
     struct stat st;
     DIR *dir;
     struct dirent *entry;
-    char fnamein[BUF_MAX][BUF_MAX], fnameout[BUF_MAX];
+    char fnamein[BUF_MAX][PATH_MAX], fnameout[PATH_MAX];
     char *ext;
     int fileCount = 0;
+    size_t len;
+    FILE *fin, *fout;
+    char buf[PATH_MAX];
 
     if (argc != 2) {
         fprintf(stderr, "Usage: VMTranslator source(.vm)\n");
@@ -37,19 +39,53 @@ int main(int argc, char *argv[])
     }
 
     if (S_ISDIR(st.st_mode)) {
-        printf("Directory\n");
+        if ((dir = opendir(argv[1])) == NULL) {
+            perror("argv[1]");
+            return 1;
+        }
+
+        while ((entry = readdir(dir)) != NULL) {
+            // ignore "." ".."
+            if (!strcmp(entry->d_name, ".")
+                || !strcmp(entry->d_name, ".."))
+                continue;
+
+            ext = strrchr(entry->d_name, '.');
+
+            // choose ".vm"
+            if (ext != NULL && !strcmp(ext, EXTIN)) {
+                len = strlen(argv[1]);
+
+                if (len > 0 && argv[1][len-1] != '/')
+                    snprintf(fnamein[fileCount], PATH_MAX,
+                            "%s/%s", argv[1], entry->d_name);
+                else 
+                    snprintf(fnamein[fileCount], PATH_MAX,
+                            "%s%s", argv[1], entry->d_name);
+
+                fileCount++;
+            }
+        }
+
+        closedir(dir);
+
+        strcpy(buf, argv[1]);
+        len = strlen(buf);
+
+        if (buf[len-1] == '/')
+            buf[len-1] = '\0';
+
+        snprintf(fnameout, PATH_MAX, "%s%s", buf, EXTOUT);
     } else if (S_ISREG(st.st_mode)) {
         strcpy(fnameout, argv[1]);
         ext = strrchr(fnameout, '.');
 
-        if (ext == NULL ||strcmp(ext, EXTIN)) {
+        if (ext == NULL || strcmp(ext, EXTIN)) {
             fprintf(stderr, "Usage: VMTranslator source.vm\n");
             exit(1);
         }
 
         *ext = '\0';
-
-        setFileName(fnameout);
     
         strcat(fnameout, EXTOUT);
         strcpy(fnamein[fileCount], argv[1]);
@@ -59,50 +95,39 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    for (int i = 0; i < fileCount; i++) {
-        printf("%s\n", fnamein[i]);
+    if (fileCount == 0) {
+        fprintf(stderr, "No .vm files found\n");
+        return 1;
     }
 
+    if ((fout = fopen(fnameout, "w")) == NULL) {
+        perror(fnameout);
+        exit(1);
+    }
+
+    for (int i = 0; i < fileCount; i++) {
+        if ((fin = fopen(fnamein[i], "r")) == NULL) {
+            perror(fnamein[i]);
+            fclose(fout);
+            exit(1);
+        }
+
+        if (i == 0)
+            Initialize(fout);
+
+        setFileName(fnamein[i]);
+
+        parser(fin, fout);
+
+        fclose(fin);
+    }
+
+    fclose(fout);
+
     return 0;
-    
-    // strcpy(fnamein, argv[1]);
-    // strcpy(fnameout, argv[1]);
-
-    // ext = strrchr(fnameout, '.');
-
-    
-    // }
-
-    // *ext = '\0';
-
-    // char *base = strrchr(fnameout, '/');
-
-    // if (base != NULL)
-    //     strcpy(g_filename, base+1);
-    // else
-    //     strcpy(g_filename, fnameout);
-    
-    // strcat(fnameout, EXTOUT);
-
-    // if ((fin = fopen(fnamein, "r")) == NULL) {
-    //     perror(fnamein);
-    //     exit(1);
-    // }
-
-    // if ((fout = fopen(fnameout, "w")) == NULL) {
-    //     perror(fnameout);
-    //     exit(1);
-    // }
-
-    // Initialize(fout);
-
-    // parser(fin, fout);
-
-    // fclose(fin);
-    // fclose(fout);
 }
 
-static void setFileName(char *fn)
+static void setFileName(const char *fn)
 {
     char *base = strrchr(fn, '/');
 
@@ -110,4 +135,9 @@ static void setFileName(char *fn)
         strcpy(g_filename, base+1);
     else
         strcpy(g_filename, fn);
+
+    char *ext = strrchr(g_filename, '.');
+
+    if (ext != NULL)
+        *ext = '\0';
 }
