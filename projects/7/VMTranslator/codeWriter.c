@@ -8,7 +8,6 @@
 
 static int labelCount = 0;
 
-// Refer to the sand file.
 void Initialize(FILE *fout)
 {
     fprintf(fout, 
@@ -18,7 +17,6 @@ void Initialize(FILE *fout)
             "M=D\n");
 }
 
-// Refer to the sand file.
 void writeArithmetic(FILE *fout, const char *cmd)
 {
     const char *buf;
@@ -87,7 +85,6 @@ void writeArithmetic(FILE *fout, const char *cmd)
     }
 }
 
-// Refer to the sand file.
 void writePush(FILE *fout, const char *seg, const int idx)
 {
     const char *buf;
@@ -169,7 +166,6 @@ void writePush(FILE *fout, const char *seg, const int idx)
     }
 }
 
-// Refer to the sand file.
 void writePop(FILE *fout, const char *seg, const int idx)
 {
     const char *buf;
