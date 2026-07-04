@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     int fileCount = 0;
     size_t len;
     FILE *fin, *fout;
-    char buf[PATH_MAX];
+    char buf[256];
 
     if (argc != 2) {
         fprintf(stderr, "Usage: VMTranslator source(.vm)\n");
@@ -81,8 +81,7 @@ int main(int argc, char *argv[])
         if (buf[len-1] == '/')
             buf[len-1] = '\0';
 
-        strcat(buf, EXTOUT);
-        strcpy(fnameout, buf);
+        snprintf(fnameout, PATH_MAX, "%s/%s%s", buf, buf, EXTOUT);
     } else if (S_ISREG(st.st_mode)) {
         strcpy(fnameout, argv[1]);
         ext = strrchr(fnameout, '.');
@@ -130,6 +129,11 @@ int main(int argc, char *argv[])
     }
 
     fclose(fout);
+
+    if (S_ISDIR(st.st_mode))
+        printf("VM translation completed (directory mode): %d files\n", fileCount);
+    else
+        printf("VM translation completed (single file mode): 1 file\n");
 
     return 0;
 }

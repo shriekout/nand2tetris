@@ -25,14 +25,30 @@ void parser(FILE *fin, FILE *fout)
         
         type = getCommandType(cmd);
 
-        if (type == C_ARITHMETIC)
-            writeArithmetic(fout, cmd);
-        else if (type == C_PUSH) {
-            idx = atoi(arg2);
-            writePush(fout, arg1, idx);
-        } else if (type == C_POP) {
-            idx = atoi(arg2);
-            writePop(fout, arg1, idx);
+        switch (type) {
+            case C_ARITHMETIC:
+                writeArithmetic(fout, cmd);
+                break;
+            case C_PUSH:
+                idx = atoi(arg2);
+                writePush(fout, arg1, idx);
+                break;
+            case C_POP:
+                idx = atoi(arg2);
+                writePop(fout, arg1, idx);
+                break;
+            case C_LABEL:
+                writeLabel(fout, arg1);
+                break;
+            case C_IF:
+                writeIF(fout, arg1);
+                break;
+            case C_GOTO:
+                writeGoto(fout, arg1);
+                break;
+            default:
+                fprintf(stderr, "%s: Unknown Command: %s\n", g_filename, cmd);
+                exit(1);
         }
     }
 }

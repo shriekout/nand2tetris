@@ -244,3 +244,27 @@ void writePop(FILE *fout, const char *seg, const int idx)
         exit(EXIT_FAILURE);
     }
 }
+
+void writeLabel(FILE *fout, const char *arg1)
+{
+    fprintf(fout, "(%s)\n", arg1);
+}
+
+void writeIF(FILE *fout, const char *arg1)
+{
+    fprintf(fout, 
+            "@SP\n"
+            "AM=M-1\n"
+            "D=M\n"
+            "@%s\n"
+            "D;JNE\n",
+            arg1);
+}
+
+void writeGoto(FILE *fout, const char *arg1)
+{
+    fprintf(fout,
+            "@%s\n"
+            "0;JMP\n",
+            arg1);
+}
