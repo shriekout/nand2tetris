@@ -22,7 +22,7 @@ This repository contains my solutions and implementations for the **Nand2Tetris*
 
 - [x] Chapter 7: Virtual Machine I – Processing
 - [x] Chapter 8: Virtual Machine II – Control
-- [~] Chapter 9: High-Level Language
+- [ ] Chapter 9: High-Level Language
 - [ ] Chapter 10: Compiler I – Syntax Analysis
 - [ ] Chapter 11: Compiler II – Code Generation
 - [ ] Chapter 12: Operating System
