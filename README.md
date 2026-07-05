@@ -21,8 +21,8 @@ This repository contains my solutions and implementations for the **Nand2Tetris*
 ### Part II – Software
 
 :white_check_mark: Chapter 7: Virtual Machine I – Processing<br>
-:construction: Chapter 8: Virtual Machine II – Control<br>
-:hourglass_flowing_sand: Chapter 9: High-Level Language<br>
+:white_check_mark: Chapter 8: Virtual Machine II – Control<br>
+:construction: Chapter 9: High-Level Language<br>
 :hourglass_flowing_sand: Chapter 10: Compiler I – Syntax Analysis<br>
 :hourglass_flowing_sand: Chapter 11: Compiler II – Code Generation<br>
 :hourglass_flowing_sand: Chapter 12: Operating System<br>
