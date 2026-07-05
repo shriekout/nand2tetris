@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
     size_t len;
     FILE *fin, *fout;
     char buf[256];
+    char *base;
 
     if (argc != 2) {
         fprintf(stderr, "Usage: VMTranslator source(.vm)\n");
@@ -81,7 +82,14 @@ int main(int argc, char *argv[])
         if (buf[len-1] == '/')
             buf[len-1] = '\0';
 
-        snprintf(fnameout, PATH_MAX, "%s/%s%s", buf, buf, EXTOUT);
+        base = strrchr(buf, '/');
+
+        if (base)
+            base++;
+        else
+            base = buf;
+
+        snprintf(fnameout, PATH_MAX, "%s/%s%s", buf, base, EXTOUT);
     } else if (S_ISREG(st.st_mode)) {
         strcpy(fnameout, argv[1]);
         ext = strrchr(fnameout, '.');

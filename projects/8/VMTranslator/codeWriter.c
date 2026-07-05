@@ -14,6 +14,7 @@ static void writeIF(FILE*, const char*);
 static void writeGoto(FILE*, const char*);
 static void writeFunction(FILE*, const char*, const int);
 static void writeReturn(FILE*);
+static void writeCall(FILE*, const char*, const int);
 
 static int labelCount = 0;
 static char currentFunction[BUF_MAX] = "";
@@ -71,6 +72,12 @@ void codeWrite(FILE *fout, char *buf)
             break;
         }
 
+        case C_CALL: {
+            int nVars = atoi(arg2);
+            writeCall(fout, arg1, nVars);
+            break;
+        }
+
         default:
             fprintf(stderr, "%s: Unknown Command: %s\n", g_filename, cmd);
             exit(1);
@@ -84,6 +91,8 @@ void writeBootstrap(FILE *fout)
             "D=A\n"
             "@SP\n"
             "M=D\n");
+
+    writeCall(fout, "Sys.init", 0);
 }
 
 static void writeArithmetic(FILE *fout, const char *cmd)
@@ -325,7 +334,7 @@ static void writeIF(FILE *fout, const char *arg1)
             "@SP\n"
             "AM=M-1\n"
             "D=M\n"
-            "%s$%s\n"
+            "@%s$%s\n"
             "D;JNE\n",
             currentFunction, arg1);
 }
@@ -333,7 +342,7 @@ static void writeIF(FILE *fout, const char *arg1)
 static void writeGoto(FILE *fout, const char *arg1)
 {
     fprintf(fout,
-            "%s$%s\n"
+            "@%s$%s\n"
             "0;JMP\n",
             currentFunction, arg1);
 }
@@ -395,4 +404,78 @@ static void writeReturn(FILE *fout)
             "@R14\n"
             "A=M\n"
             "0;JMP\n");
+}
+
+static void writeCall(FILE *fout, const char *funName, const int nArgs)
+{
+    int id = labelCount++;
+
+    fprintf(fout,
+            "@RETURN%d\n"   // push retAddr
+            "D=A\n"
+            "@SP\n"
+            "A=M\n"
+            "M=D\n"
+            "@SP\n"
+            "M=M+1\n",
+            id);
+
+    fprintf(fout,
+            "@LCL\n"    // push LCL
+            "D=M\n"
+            "@SP\n"
+            "A=M\n"
+            "M=D\n"
+            "@SP\n"
+            "M=M+1\n");
+
+    fprintf(fout,
+            "@ARG\n"    // push ARG
+            "D=M\n"
+            "@SP\n"
+            "A=M\n"
+            "M=D\n"
+            "@SP\n"
+            "M=M+1\n");
+
+    fprintf(fout,
+            "@THIS\n"    // push THIS
+            "D=M\n"
+            "@SP\n"
+            "A=M\n"
+            "M=D\n"
+            "@SP\n"
+            "M=M+1\n");
+
+    fprintf(fout,
+            "@THAT\n"    // push THAT
+            "D=M\n"
+            "@SP\n"
+            "A=M\n"
+            "M=D\n"
+            "@SP\n"
+            "M=M+1\n");
+
+    fprintf(fout,
+            "@SP\n"     // ARG = SP - nArg - 5
+            "D=M\n"
+            "@%d\n"
+            "D=D-A\n"
+            "@5\n"
+            "D=D-A\n"
+            "@ARG\n"
+            "M=D\n",
+            nArgs);
+
+    fprintf(fout,
+            "@SP\n"     // LCL = SP
+            "D=M\n"
+            "@LCL\n"
+            "M=D\n");
+
+    fprintf(fout,
+            "@%s\n"
+            "0;JMP\n"
+            "(RETURN%d)\n",
+            funName, id);
 }
