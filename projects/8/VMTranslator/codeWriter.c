@@ -7,6 +7,61 @@
 #include "config.h"
 
 static int labelCount = 0;
+static char currentFunction[BUF_MAX];
+
+void codeWrite(FILE *fout, char *buf)
+{
+    char *cmd, *arg1, *arg2;
+    commandType type;
+    
+    splitCmd(buf, &cmd, &arg1, &arg2);
+    
+    type = getCommandType(cmd);
+
+    switch (type) {
+        case C_ARITHMETIC: {
+            writeArithmetic(fout, cmd);
+            break;
+        }
+
+        case C_PUSH: {
+            int idx = atoi(arg2);
+            writePush(fout, arg1, idx);
+            break;
+        }
+
+        case C_POP: {
+            int idx = atoi(arg2);
+            writePop(fout, arg1, idx);
+            break;
+        }
+
+        case C_LABEL: {
+            writeLabel(fout, arg1);
+            break;
+        }
+
+        case C_IF: {
+            writeIF(fout, arg1);
+            break;
+        }
+
+        case C_GOTO: {
+            writeGoto(fout, arg1);
+            break;
+        }
+
+        case C_FUNCTION: {
+            int nVars = atoi(arg2);
+            writeFunction(fout, arg1, nVars);
+            break;
+        }
+
+        default:
+            fprintf(stderr, "%s: Unknown Command: %s\n", g_filename, cmd);
+            exit(1);
+    }
+}
 
 void writeBootstrap(FILE *fout)
 {
@@ -247,7 +302,7 @@ void writePop(FILE *fout, const char *seg, const int idx)
 
 void writeLabel(FILE *fout, const char *arg1)
 {
-    fprintf(fout, "(%s)\n", arg1);
+    fprintf(fout, "(%s$%s)\n", currentFunction, arg1);
 }
 
 void writeIF(FILE *fout, const char *arg1)
@@ -256,15 +311,27 @@ void writeIF(FILE *fout, const char *arg1)
             "@SP\n"
             "AM=M-1\n"
             "D=M\n"
-            "@%s\n"
+            "@%s$%s\n"
             "D;JNE\n",
-            arg1);
+            currentFunction, arg1);
 }
 
 void writeGoto(FILE *fout, const char *arg1)
 {
     fprintf(fout,
-            "@%s\n"
+            "@%s$%s\n"
             "0;JMP\n",
-            arg1);
+            currentFunction, arg1);
+}
+
+void writeFunction(FILE *fout, const char *funName, const int nVars)
+{
+    strcpy(currentFunction, funName);
+
+    fprintf(fout, "(%s)\n", funName);
+
+    for (int i = 0; i < nVars; i++) {
+        char buf[] = "push constant 0";
+        codeWrite(fout, buf);
+    }
 }

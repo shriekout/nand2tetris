@@ -11,9 +11,6 @@
 void parser(FILE *fin, FILE *fout)
 {
     char buf[BUF_MAX];
-    char *cmd, *arg1, *arg2;
-    commandType type;
-    int idx;
 
     while (fgets(buf, BUF_MAX, fin) != NULL) {
         removeComment(buf);
@@ -21,35 +18,7 @@ void parser(FILE *fin, FILE *fout)
         if (isBlank(buf))
             continue;
 
-        splitCmd(buf, &cmd, &arg1, &arg2);
-        
-        type = getCommandType(cmd);
-
-        switch (type) {
-            case C_ARITHMETIC:
-                writeArithmetic(fout, cmd);
-                break;
-            case C_PUSH:
-                idx = atoi(arg2);
-                writePush(fout, arg1, idx);
-                break;
-            case C_POP:
-                idx = atoi(arg2);
-                writePop(fout, arg1, idx);
-                break;
-            case C_LABEL:
-                writeLabel(fout, arg1);
-                break;
-            case C_IF:
-                writeIF(fout, arg1);
-                break;
-            case C_GOTO:
-                writeGoto(fout, arg1);
-                break;
-            default:
-                fprintf(stderr, "%s: Unknown Command: %s\n", g_filename, cmd);
-                exit(1);
-        }
+        codeWrite(fout, buf);
     }
 }
 
