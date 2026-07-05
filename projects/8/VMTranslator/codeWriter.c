@@ -6,8 +6,17 @@
 #include "codeWriter.h"
 #include "config.h"
 
+static void writeArithmetic(FILE *, const char*);
+static void writePush(FILE*, const char*, const int);
+static void writePop(FILE*, const char*, const int);
+static void writeLabel(FILE*, const char*);
+static void writeIF(FILE*, const char*);
+static void writeGoto(FILE*, const char*);
+static void writeFunction(FILE*, const char*, const int);
+static void writeReturn(FILE*);
+
 static int labelCount = 0;
-static char currentFunction[BUF_MAX];
+static char currentFunction[BUF_MAX] = "";
 
 void codeWrite(FILE *fout, char *buf)
 {
@@ -57,6 +66,11 @@ void codeWrite(FILE *fout, char *buf)
             break;
         }
 
+        case C_RETURN: {
+            writeReturn(fout);
+            break;
+        }
+
         default:
             fprintf(stderr, "%s: Unknown Command: %s\n", g_filename, cmd);
             exit(1);
@@ -72,7 +86,7 @@ void writeBootstrap(FILE *fout)
             "M=D\n");
 }
 
-void writeArithmetic(FILE *fout, const char *cmd)
+static void writeArithmetic(FILE *fout, const char *cmd)
 {
     const char *buf;
 
@@ -140,7 +154,7 @@ void writeArithmetic(FILE *fout, const char *cmd)
     }
 }
 
-void writePush(FILE *fout, const char *seg, const int idx)
+static void writePush(FILE *fout, const char *seg, const int idx)
 {
     const char *buf;
 
@@ -225,7 +239,7 @@ void writePush(FILE *fout, const char *seg, const int idx)
     }
 }
 
-void writePop(FILE *fout, const char *seg, const int idx)
+static void writePop(FILE *fout, const char *seg, const int idx)
 {
     const char *buf;
 
@@ -300,31 +314,31 @@ void writePop(FILE *fout, const char *seg, const int idx)
     }
 }
 
-void writeLabel(FILE *fout, const char *arg1)
+static void writeLabel(FILE *fout, const char *arg1)
 {
     fprintf(fout, "(%s$%s)\n", currentFunction, arg1);
 }
 
-void writeIF(FILE *fout, const char *arg1)
+static void writeIF(FILE *fout, const char *arg1)
 {
     fprintf(fout, 
             "@SP\n"
             "AM=M-1\n"
             "D=M\n"
-            "@%s$%s\n"
+            "%s$%s\n"
             "D;JNE\n",
             currentFunction, arg1);
 }
 
-void writeGoto(FILE *fout, const char *arg1)
+static void writeGoto(FILE *fout, const char *arg1)
 {
     fprintf(fout,
-            "@%s$%s\n"
+            "%s$%s\n"
             "0;JMP\n",
             currentFunction, arg1);
 }
 
-void writeFunction(FILE *fout, const char *funName, const int nVars)
+static void writeFunction(FILE *fout, const char *funName, const int nVars)
 {
     strcpy(currentFunction, funName);
 
@@ -334,4 +348,51 @@ void writeFunction(FILE *fout, const char *funName, const int nVars)
         char buf[] = "push constant 0";
         codeWrite(fout, buf);
     }
+}
+
+static void writeReturn(FILE *fout)
+{
+    fprintf(fout,
+            "@LCL\n"
+            "D=M\n"
+            "@R13\n"
+            "M=D\n"
+            "@5\n"
+            "A=D-A\n"
+            "D=M\n"
+            "@R14\n"
+            "M=D\n"
+            "@SP\n"
+            "AM=M-1\n"
+            "D=M\n"
+            "@ARG\n"
+            "A=M\n"
+            "M=D\n"
+            "@ARG\n"
+            "D=M+1\n"
+            "@SP\n"
+            "M=D\n"
+            "@R13\n"
+            "AM=M-1\n"
+            "D=M\n"
+            "@THAT\n"
+            "M=D\n"
+            "@R13\n"
+            "AM=M-1\n"
+            "D=M\n"
+            "@THIS\n"
+            "M=D\n"
+            "@R13\n"
+            "AM=M-1\n"
+            "D=M\n"
+            "@ARG\n"
+            "M=D\n"
+            "@R13\n"
+            "AM=M-1\n"
+            "D=M\n"
+            "@LCL\n"
+            "M=D\n"
+            "@R14\n"
+            "A=M\n"
+            "0;JMP\n");
 }

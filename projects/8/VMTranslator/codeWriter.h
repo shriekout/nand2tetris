@@ -7,12 +7,5 @@
 
 void codeWrite(FILE*, char *);
 void writeBootstrap(FILE*);
-void writeArithmetic(FILE *, const char*);
-void writePush(FILE*, const char*, const int);
-void writePop(FILE*, const char*, const int);
-void writeLabel(FILE*, const char*);
-void writeIF(FILE*, const char*);
-void writeGoto(FILE*, const char*);
-void writeFunction(FILE*, const char*, const int);
 
 #endif
