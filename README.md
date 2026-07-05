@@ -11,40 +11,33 @@ This repository contains my solutions and implementations for the **Nand2Tetris*
 
 ### Part I – Hardware
 
-:white_check_mark: Chapter 1: Boolean Logic<br>
-:white_check_mark: Chapter 2: Boolean Arithmetic<br>
-:white_check_mark: Chapter 3: Memory<br>
-:white_check_mark: Chapter 4: Machine Language<br>
-:white_check_mark: Chapter 5: Computer Architecture<br>
-:white_check_mark: Chapter 6: Assembler<br>
+- [x] Chapter 1: Boolean Logic
+- [x] Chapter 2: Boolean Arithmetic
+- [x] Chapter 3: Memory
+- [x] Chapter 4: Machine Language
+- [x] Chapter 5: Computer Architecture
+- [x] Chapter 6: Assembler
 
 ### Part II – Software
 
-:white_check_mark: Chapter 7: Virtual Machine I – Processing<br>
-:white_check_mark: Chapter 8: Virtual Machine II – Control<br>
-:construction: Chapter 9: High-Level Language<br>
-:hourglass_flowing_sand: Chapter 10: Compiler I – Syntax Analysis<br>
-:hourglass_flowing_sand: Chapter 11: Compiler II – Code Generation<br>
-:hourglass_flowing_sand: Chapter 12: Operating System<br>
-:hourglass_flowing_sand: Chapter 13: More Fun to Go<br>
+- [x] Chapter 7: Virtual Machine I – Processing
+- [x] Chapter 8: Virtual Machine II – Control
+- [~] Chapter 9: High-Level Language<br>
+- [ ] Chapter 10: Compiler I – Syntax Analysis
+- [ ] Chapter 11: Compiler II – Code Generation
+- [ ] Chapter 12: Operating System
+- [ ] Chapter 13: More Fun to Go
 
-### Legend
+## Learning Environment
 
-:white_check_mark: Completed<br>
-:construction: In progress<br>
-:hourglass_flowing_sand: Planned<br>
-
-## Development Environment
-
-* Windows Subsystem for Linux (WSL)
-* Debian
-* GCC
-* Make
-* Git
+* WSL / Debian
+* GCC / Make
 * VS code
+* Git
+* Java (if using official tools)
 
 ## Acknowledgements
 
-This project is part of my personal Nand2Tetris learning journey.
+This project documents my Nand2Tetris learning journey.
 
-During development, I used ChatGPT as a learning assistant to better understand computer architecture, C programming, and Git. All implementations, testing, and final design decisions were completed by me.
+ChatGPT was used as a learning assistant to clarify concepts in computer architecture, C programming, and Git. All implementations and design decisions were independently made.
