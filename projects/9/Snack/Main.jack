@@ -1,0 +1,11 @@
+class Main {
+    function void main() {
+        var SnackGame snackgame;
+
+        let snackgame = SnackGame.new();
+
+        do snackgame.run();
+
+        return;
+    }
+}

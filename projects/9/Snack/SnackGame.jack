@@ -1,0 +1,49 @@
+class SnackGame {
+    field Snack snack;
+    field int direction;
+
+    constructor SnackGame new() {
+        let snack = Snack.new();
+        let direction = 4;  // 1: UP | 2: Down | 3: Left | 4: Right
+
+        return this;
+    }
+
+    method void dispose() {        
+        do snack.dispose();
+        do Memory.deAlloc(this);
+
+        return;
+    }
+
+    method void run() {
+        var char key;
+        var boolean exit;
+
+        let key = 0;
+        let exit = false;
+
+        while (~exit) {
+            let key = Keyboard.keyPressed();
+
+            if (key = 131) { let direction = 1; }   // up arrow
+            if (key = 133) { let direction = 2; }   // down arrow
+            if (key = 130) { let direction = 3; }   // left arrow
+            if (key = 132) { let direction = 4; }   // right arrow
+
+            do moveSnack();
+            do Sys.wait(100);
+        }
+
+        return;
+    }
+
+    method void moveSnack() {
+        if (direction = 1) { do snack.move(0, -1); } // up
+        if (direction = 2) { do snack.move(0, 1); } // down
+        if (direction = 3) { do snack.move(-1, 0); } // left
+        if (direction = 4) { do snack.move(1, 0); } // right
+
+        return;
+    }
+}

@@ -1,0 +1,93 @@
+class Snack {
+    field Array snackX;
+    field Array snackY;
+    field int snackSize;
+    field int snackLength;
+
+    constructor Snack new() {
+        var int count;
+
+        let snackX = Array.new(100);
+        let snackY = Array.new(100);
+        let snackSize = 8;
+        let snackLength = 3;
+
+        let count = 0;
+
+        while (count < snackLength) {
+            let snackX[count] = 10 - count;
+            let snackY[count] = 10;
+            let count = count + 1;
+        }
+
+        do initDraw();
+
+        return this;
+    }
+
+    method void dispose() {
+        do snackX.dispose();
+        do snackY.dispose();
+        do Memory.deAlloc(this);
+
+        return;
+    }
+
+    method void initDraw() {
+        var int count;
+        var int x, y;
+
+        let count = 0;
+
+        do Screen.setColor(true);
+        
+        while (count < snackLength) {
+            let x = snackX[count] * snackSize;
+            let y = snackY[count] * snackSize;
+
+            do Screen.drawRectangle(x, y, x+snackSize-1, y+snackSize-1);
+
+            let count = count + 1;
+        }
+
+        return;
+    }
+
+    method void move(int dx, int dy) {
+        var int count;
+        var int tailX, tailY;
+
+        let count = snackLength - 1;
+
+        // Shift body segments from tail toward the head.
+        let tailX = snackX[snackLength-1];
+        let tailY = snackY[snackLength-1];
+
+        while (count > 0) {
+            let snackX[count] = snackX[count-1];
+            let snackY[count] = snackY[count-1];
+
+            let count = count - 1;
+        }
+
+        // move the head.
+        let snackX[0] = snackX[0] + dx;
+        let snackY[0] = snackY[0] + dy;
+
+        // erase previous tail
+        do Screen.setColor(false);
+        do Screen.drawRectangle(
+            tailX*snackSize, tailY*snackSize,
+            tailX*snackSize+snackSize-1, tailY*snackSize+snackSize-1
+        );
+
+        // draw new head
+        do Screen.setColor(true);
+        do Screen.drawRectangle(
+            snackX[0]*snackSize, snackY[0]*snackSize,
+            snackX[0]*snackSize+snackSize-1, snackY[0]*snackSize+snackSize-1
+        ); 
+
+        return;
+    }
+}
