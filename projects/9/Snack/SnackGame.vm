@@ -1,11 +1,13 @@
 function SnackGame.new 0
-push constant 2
+push constant 3
 call Memory.alloc 1
 pop pointer 0
 call Snack.new 0
 pop this 0
 push constant 4
 pop this 1
+push constant 0
+pop this 2
 push pointer 0
 return
 function SnackGame.dispose 0
@@ -19,15 +21,13 @@ call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
-function SnackGame.run 2
+function SnackGame.run 1
 push argument 0
 pop pointer 0
 push constant 0
 pop local 0
-push constant 0
-pop local 1
 label WHILE_EXP0
-push local 1
+push this 2
 not
 not
 if-goto WHILE_END0
@@ -93,7 +93,8 @@ push constant 0
 push constant 1
 neg
 call Snack.move 3
-pop temp 0
+not
+pop this 2
 label IF_FALSE0
 push this 1
 push constant 2
@@ -105,7 +106,8 @@ push this 0
 push constant 0
 push constant 1
 call Snack.move 3
-pop temp 0
+not
+pop this 2
 label IF_FALSE1
 push this 1
 push constant 3
@@ -118,7 +120,8 @@ push constant 1
 neg
 push constant 0
 call Snack.move 3
-pop temp 0
+not
+pop this 2
 label IF_FALSE2
 push this 1
 push constant 4
@@ -130,7 +133,8 @@ push this 0
 push constant 1
 push constant 0
 call Snack.move 3
-pop temp 0
+not
+pop this 2
 label IF_FALSE3
 push constant 0
 return

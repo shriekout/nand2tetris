@@ -53,7 +53,7 @@ class Snack {
         return;
     }
 
-    method void move(int dx, int dy) {
+    method boolean move(int dx, int dy) {
         var int count;
         var int tailX, tailY;
 
@@ -74,6 +74,15 @@ class Snack {
         let snackX[0] = snackX[0] + dx;
         let snackY[0] = snackY[0] + dy;
 
+        // Check for wall collision.
+        if ((snackX[0] < 0) | (snackX[0] > 63)) {
+            return false;
+        }
+
+        if ((snackY[0] < 0) | (snackY[0] > 31)) {
+            return false;
+        }
+
         // erase previous tail
         do Screen.setColor(false);
         do Screen.drawRectangle(
@@ -88,6 +97,6 @@ class Snack {
             snackX[0]*snackSize+snackSize-1, snackY[0]*snackSize+snackSize-1
         ); 
 
-        return;
+        return true;
     }
 }

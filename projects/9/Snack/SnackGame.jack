@@ -1,10 +1,12 @@
 class SnackGame {
     field Snack snack;
     field int direction;
+    field boolean exit;
 
     constructor SnackGame new() {
         let snack = Snack.new();
         let direction = 4;  // 1: UP | 2: Down | 3: Left | 4: Right
+        let exit = false;
 
         return this;
     }
@@ -18,10 +20,8 @@ class SnackGame {
 
     method void run() {
         var char key;
-        var boolean exit;
 
         let key = 0;
-        let exit = false;
 
         while (~exit) {
             let key = Keyboard.keyPressed();
@@ -39,10 +39,10 @@ class SnackGame {
     }
 
     method void moveSnack() {
-        if (direction = 1) { do snack.move(0, -1); } // up
-        if (direction = 2) { do snack.move(0, 1); } // down
-        if (direction = 3) { do snack.move(-1, 0); } // left
-        if (direction = 4) { do snack.move(1, 0); } // right
+        if (direction = 1) { let exit = ~snack.move(0, -1); } // up
+        if (direction = 2) { let exit = ~snack.move(0, 1); } // down
+        if (direction = 3) { let exit = ~snack.move(-1, 0); } // left
+        if (direction = 4) { let exit = ~snack.move(1, 0); } // right
 
         return;
     }
