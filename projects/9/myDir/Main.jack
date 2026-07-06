@@ -1,0 +1,13 @@
+class Main {
+    function void main() {
+        var MyClass myclass;
+
+        let myclass = MyClass.new(0, 0, 20);
+
+        do myclass.run();
+
+        do myclass.dispose();
+
+        return;
+    }
+}
