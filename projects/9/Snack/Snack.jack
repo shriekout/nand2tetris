@@ -83,10 +83,28 @@ class Snack {
             return false;
         }
 
+        // Check for self-collision.
+        let count = 1;
+
+        while (count < snackLength) {
+            if ((snackX[0] = snackX[count]) 
+                & (snackY[0] = snackY[count])) {
+                    return false;
+                }
+
+            let count = count + 1;
+        }
+
         if (eat) {
             let snackX[snackLength] = tailX;
             let snackY[snackLength] = tailY;
-            let snackLength = snackLength + 1;
+
+            if (snackLength = 99) {
+                do Output.moveCursor(11, 26);
+                do Output.printString("You're the dragon!");
+            } else {
+                let snackLength = snackLength + 1;
+            }
         } else {
             // erase previous tail
             do Screen.setColor(false);
@@ -112,5 +130,17 @@ class Snack {
 
     method int getHeadY() {
         return snackY[0];
+    }
+
+    method Array getSnackX() {
+        return snackX;
+    }
+
+    method Array getSnackY() {
+        return snackY;
+    }
+
+    method int getSnackLength() {
+        return snackLength;
     }
 }

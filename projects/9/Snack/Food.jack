@@ -2,19 +2,27 @@ class Food {
     field int foodX;
     field int foodY;
     field int foodSize;
-    field int seed;
+    field int count;
 
     constructor Food new() {
         let foodSize = 8;
+        let count = 0;
 
-        do createFood();
+        do createFood(null, null, 0, 0);
 
         return this;
     }
 
-    method void createFood() {
-        let foodX = 3;
-        let foodY = 3;
+    method void createFood(Array sX, Array sY, int direction, int len) {
+        if (sX = null) {
+            let foodX = 3;
+            let foodY = 3;
+        } else {
+            while (contain(sX, sY, len)) {
+                let foodX = random(sX[0], sY[0], direction, 64);
+                let foodY = random(sX[0], sY[0], direction + count, 32);
+            }
+        }
 
         do Screen.setColor(true);
         do Screen.drawRectangle(
@@ -33,5 +41,35 @@ class Food {
 
     method int getFoodY() {
         return foodY;
+    }
+
+    method int random(int hX, int hY, int direction, int r) {
+        var int seed;
+
+        let seed = hX * hX * hY * hY * direction - (direction * count);
+
+        if (seed < 0) {
+            let seed = Math.abs(seed);
+        }
+
+        let count = count + 1;
+
+        return seed - (Math.divide(seed, r) * r);
+    }
+
+    method boolean contain(Array sX, Array sY, int len) {
+        var int i;
+
+        let i = 0;
+
+        while (i < len) {
+            if ((sX[i] = foodX) & (sY[i] = foodY)) {
+                return true;
+            }
+
+            let i = i + 1;
+        }
+
+        return false;
     }
 }

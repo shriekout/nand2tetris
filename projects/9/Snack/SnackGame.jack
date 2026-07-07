@@ -6,11 +6,12 @@ class SnackGame {
     field boolean exit;
 
     constructor SnackGame new() {
-        let snack = Snack.new();
-        let food = Food.new();
         let direction = 4;  // 1: UP | 2: Down | 3: Left | 4: Right
         let eat = false;
         let exit = false;
+
+        let snack = Snack.new();
+        let food = Food.new();
 
         return this;
     }
@@ -61,6 +62,9 @@ class SnackGame {
             if ((snack.getHeadX() = food.getFoodX())
                 & (snack.getHeadY() = food.getFoodY())) {
                 let eat = true;
+
+                do food.createFood(snack.getSnackX(), snack.getSnackY(), 
+                                    direction, snack.getSnackLength());
             }
 
             do moveSnack();
@@ -86,15 +90,21 @@ class SnackGame {
     }
 
     method void gameOver() {
-        do Screen.setColor(true);
-        do Screen.drawRectangle(118, 88, 394, 168);
-        
-        // 테두리
-        do Screen.setColor(false);
-        do Screen.drawRectangle(120, 90, 392, 166);
+        do drawBox();
 
         do Output.moveCursor(11, 26);
         do Output.printString("GAME OVER");
+
+        return;
+    }
+
+    // 테두리 있는 텍스트 박스
+    method void drawBox() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(118, 88, 394, 168);
+        
+        do Screen.setColor(false);
+        do Screen.drawRectangle(120, 90, 392, 166);
 
         return;
     }
