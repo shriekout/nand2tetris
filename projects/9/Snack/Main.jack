@@ -6,6 +6,8 @@ class Main {
 
         do snackgame.run();
 
+        do snackgame.gameOver();
+
         return;
     }
 }

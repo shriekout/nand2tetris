@@ -1,0 +1,37 @@
+class Food {
+    field int foodX;
+    field int foodY;
+    field int foodSize;
+    field int seed;
+
+    constructor Food new() {
+        let foodSize = 8;
+
+        do createFood();
+
+        return this;
+    }
+
+    method void createFood() {
+        let foodX = 3;
+        let foodY = 3;
+
+        do Screen.setColor(true);
+        do Screen.drawRectangle(
+            foodX * foodSize,
+            foodY * foodSize,
+            foodX * foodSize + foodSize - 1,
+            foodY * foodSize + foodSize - 1
+        );
+
+        return;
+    }
+
+    method int getFoodX() {
+        return foodX;
+    }
+
+    method int getFoodY() {
+        return foodY;
+    }
+}

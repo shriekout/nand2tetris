@@ -53,7 +53,7 @@ class Snack {
         return;
     }
 
-    method boolean move(int dx, int dy) {
+    method boolean move(int dx, int dy, int eat) {
         var int count;
         var int tailX, tailY;
 
@@ -83,12 +83,18 @@ class Snack {
             return false;
         }
 
-        // erase previous tail
-        do Screen.setColor(false);
-        do Screen.drawRectangle(
-            tailX*snackSize, tailY*snackSize,
-            tailX*snackSize+snackSize-1, tailY*snackSize+snackSize-1
-        );
+        if (eat) {
+            let snackX[snackLength] = tailX;
+            let snackY[snackLength] = tailY;
+            let snackLength = snackLength + 1;
+        } else {
+            // erase previous tail
+            do Screen.setColor(false);
+            do Screen.drawRectangle(
+                tailX*snackSize, tailY*snackSize,
+                tailX*snackSize+snackSize-1, tailY*snackSize+snackSize-1
+            );
+        } 
 
         // draw new head
         do Screen.setColor(true);
@@ -98,5 +104,13 @@ class Snack {
         ); 
 
         return true;
+    }
+
+    method int getHeadX() {
+        return snackX[0];
+    }
+
+    method int getHeadY() {
+        return snackY[0];
     }
 }

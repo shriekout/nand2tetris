@@ -1,0 +1,56 @@
+function Food.new 0
+push constant 4
+call Memory.alloc 1
+pop pointer 0
+push constant 8
+pop this 2
+push pointer 0
+call Food.createFood 1
+pop temp 0
+push pointer 0
+return
+function Food.createFood 0
+push argument 0
+pop pointer 0
+push constant 3
+pop this 0
+push constant 3
+pop this 1
+push constant 0
+not
+call Screen.setColor 1
+pop temp 0
+push this 0
+push this 2
+call Math.multiply 2
+push this 1
+push this 2
+call Math.multiply 2
+push this 0
+push this 2
+call Math.multiply 2
+push this 2
+add
+push constant 1
+sub
+push this 1
+push this 2
+call Math.multiply 2
+push this 2
+add
+push constant 1
+sub
+call Screen.drawRectangle 4
+pop temp 0
+push constant 0
+return
+function Food.getFoodX 0
+push argument 0
+pop pointer 0
+push this 0
+return
+function Food.getFoodY 0
+push argument 0
+pop pointer 0
+push this 1
+return
