@@ -286,6 +286,10 @@ label IF_TRUE2
 push constant 0
 return
 label IF_FALSE2
+push local 0
+push constant 1
+add
+pop local 0
 goto WHILE_EXP1
 label WHILE_END1
 push argument 3
@@ -309,13 +313,13 @@ pop pointer 1
 push temp 0
 pop that 0
 push this 3
-push constant 99
+push constant 4
 eq
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
 push constant 11
-push constant 26
+push constant 23
 call Output.moveCursor 2
 pop temp 0
 push constant 18

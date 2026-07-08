@@ -100,7 +100,7 @@ class Snack {
             let snackY[snackLength] = tailY;
 
             if (snackLength = 99) {
-                do Output.moveCursor(11, 26);
+                do Output.moveCursor(11, 23);
                 do Output.printString("You're the dragon!");
             } else {
                 let snackLength = snackLength + 1;
