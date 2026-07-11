@@ -3,9 +3,10 @@
 
 #include <stdio.h>
 
-void parser(FILE*, FILE*);
+void tokenize(FILE*, FILE*);
 
 typedef enum {
+    TOKEN_EOF = -1,
     KEYWORD,
     SYMBOL,
     IDENTIFIER,
@@ -35,6 +36,6 @@ typedef enum {
     FALSE,
     KW_NULL,
     THIS
-} keyword;
+} keywordType;
 
 #endif

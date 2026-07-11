@@ -121,7 +121,7 @@ static fileIO fileProcess(const char *infn, const char *outfn)
         return WRITE_FAIL;
     }
 
-    parser(fin, fout);
+    tokenize(fin, fout);
 
     fclose(fin);
     fclose(fout);

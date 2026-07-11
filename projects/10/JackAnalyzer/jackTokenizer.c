@@ -34,22 +34,60 @@ static const char *keywordArr[] = {
 
 int advance(FILE*, char*);
 int isSymbol(char);
-static tokenType getTokenType(char*);
 
-void parser(FILE *fin, FILE *fout)
+void tokenize(FILE *fin, FILE *fout)
 {
     char token[BUF_MAX];
-    tokenType ty;
+    tokenType type;
     const char *beginTag = "<tokens>";
     const char *endTag = "</tokens>";
 
     fprintf(fout, "%s\n", beginTag);
 
-    while (advance(fin, token)) {
-        ;
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        switch (type) {
+            case KEYWORD:
+                fprintf(fout, "<keyword> %s </keyword>\n", token);
+                break;
+            
+            case SYMBOL:
+                switch (token[0]) {
+                    case '<':
+                        fprintf(fout, "<symbol> &lt; </symbol>\n");
+                        break;
+
+                    case '>':
+                        fprintf(fout, "<symbol> &gt; </symbol>\n");
+                        break;
+
+                    case '&':
+                        fprintf(fout, "<symbol> &amp; </symbol>\n");
+                        break;
+
+                    default:
+                        fprintf(fout, "<symbol> %s </symbol>\n", token);
+                        break;
+                }
+                break;
+
+            case IDENTIFIER:
+                fprintf(fout, "<identifier> %s </identifier>\n", token);
+                break;
+
+            case INT_CONST:
+                fprintf(fout, "<integerConstant> %s </integerConstant>\n", token);
+                break;
+
+            case STRING_CONST:
+                fprintf(fout, "<stringConstant> %s </stringConstant>\n", token);
+                break;
+
+            default:
+                break;
+        }
     }
 
-    fprintf(fout, "%s", endTag);
+    fprintf(fout, "%s\n", endTag);
 }
 
 int advance(FILE *fin, char *token)
@@ -81,18 +119,23 @@ int advance(FILE *fin, char *token)
             token[pToken] = '\0';
             ungetc(d, fin);
 
-            return 1;
+            return SYMBOL;
             }
         } else {
             if (c == '"') {                 // STRING_CONST
                 while ((c = fgetc(fin)) != EOF) {
-                    if (c == '"')
-                        break;
+                    if (c == '"') {
+                        token[pToken] = '\0';
+                        return STRING_CONST;
+                    }
                     
                     token[pToken++] = c;
                 }
             } else if (isSymbol(c)) {       // SYMBOL
                 token[pToken++] = c;
+                token[pToken] = '\0';
+
+                return SYMBOL;
             } else if (isdigit(c)) {        // INT_CONST
                 token[pToken++] = c;
 
@@ -101,9 +144,13 @@ int advance(FILE *fin, char *token)
                         token[pToken++] = c;
                     else {
                         ungetc(c, fin);
-                        break;
+                        token[pToken] = '\0';
+                        return INT_CONST;
                     }
                 }
+
+                token[pToken] = '\0';
+                return INT_CONST;
             } else {                        // KEYWORD or IDENTIFIER
                 token[pToken++] = c;
 
@@ -112,30 +159,33 @@ int advance(FILE *fin, char *token)
                         token[pToken++] = c;
                     } else {
                         ungetc(c, fin);
-                        break;
+                        token[pToken] = '\0';
+
+                        for (int i = 0; i < KEYWORD_COUNT; i++) {
+                            if (!strcmp(token, keywordArr[i]))
+                                return KEYWORD;
+                        }
+                        
+                        return IDENTIFIER;
                     }
                 }
-            }
 
-            token[pToken] = '\0';
-            return 1;
+                token[pToken] = '\0';
+                
+                for (int i = 0; i < KEYWORD_COUNT; i++) {
+                    if (!strcmp(token, keywordArr[i]))
+                        return KEYWORD;
+                    }
+                
+                return IDENTIFIER;
+            }
         }
     }
 
-    return 0;
+    return TOKEN_EOF;
 }
 
 int isSymbol(char c)
 {
     return strchr("{}()[].,;+-*/&|<>=~", c) != NULL;
-}
-
-static tokenType getTokenType(char *buf)
-{
-    int i;
-
-    for (i = 0; i < KEYWORD_COUNT; i++) {
-        if (!strcmp(buf, keywordArr[i]))
-            return KEYWORD;
-    }
 }
