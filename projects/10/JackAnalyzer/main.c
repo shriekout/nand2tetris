@@ -7,9 +7,15 @@
 
 #include "jackTokenizer.h"
 
+typedef enum {
+    READ_FAIL,
+    WRITE_FAIL,
+    SUCCESS
+} fileIO;
+
 static int isJack(const char*);
-static void changeExt(char*, const char*);
-static void fileProcess(const char*, const char*);
+static void changeExt(char*);
+static fileIO fileProcess(const char*, const char*);
 
 int main(int argc, char *argv[])
 {
@@ -17,7 +23,6 @@ int main(int argc, char *argv[])
     DIR *dir;
     struct dirent *entry;
     char infn[PATH_MAX], outfn[PATH_MAX];
-    const char *outExt = "xml";
 
     if (argc != 2) {
         fprintf(stderr, "Usage: JackAnalyzer source.jack\n");
@@ -52,7 +57,7 @@ int main(int argc, char *argv[])
                 strcpy(outfn, infn);
                 strcat(infn, entry->d_name);
                 strcat(outfn, entry->d_name);
-                changeExt(outfn, outExt);
+                changeExt(outfn);
 
                 fileProcess(infn, outfn);
             }
@@ -61,13 +66,13 @@ int main(int argc, char *argv[])
         closedir(dir);
     } else if (S_ISREG(st.st_mode)) {
         if (!isJack(argv[1])) {
-            fprintf(stderr, "Usage: JackAnalyzer source.\"jack\"\n");
+            fprintf(stderr, "Usage: JackAnalyzer source.jack\n");
             return 1;
         }
 
         strcpy(infn, argv[1]);
         strcpy(outfn, argv[1]);
-        changeExt(outfn, outExt);
+        changeExt(outfn);
 
         fileProcess(infn, outfn);
     } else {
@@ -87,8 +92,9 @@ static int isJack(const char *fn)
     return ext != NULL && strcmp(ext+1, inExt) == 0;
 }
 
-static void changeExt(char *fn, const char *outExt)
+static void changeExt(char *fn)
 {
+    const char *outExt = "TP.xml";
     char *ext = strrchr(fn, '.');
 
     if (ext == NULL) {
@@ -96,27 +102,29 @@ static void changeExt(char *fn, const char *outExt)
         return;
     }
 
-    *(ext+1) = '\0';
+    *ext = '\0';
     strcat(fn, outExt);
 }
 
-static void fileProcess(const char *infn, const char *outfn)
+static fileIO fileProcess(const char *infn, const char *outfn)
 {
     FILE *fin, *fout;
 
     if ((fin = fopen(infn, "r")) == NULL) {
         perror(infn);
-        exit(1);
+        return READ_FAIL;
     }
 
     if ((fout = fopen(outfn, "w")) == NULL) {
         perror(outfn);
         fclose(fin);
-        exit(1);
+        return WRITE_FAIL;
     }
 
     parser(fin, fout);
 
     fclose(fin);
     fclose(fout);
+
+    return SUCCESS;
 }
