@@ -4,8 +4,6 @@
 
 #include "jackTokenizer.h"
 
-#define BUF_MAX 256
-
 static const char *keywordArr[] = {
     "class",
     "method",
@@ -32,8 +30,7 @@ static const char *keywordArr[] = {
 
 #define KEYWORD_COUNT (sizeof(keywordArr) / sizeof(keywordArr[0]))
 
-int advance(FILE*, char*);
-int isSymbol(char);
+static int isSymbol(char);
 
 void tokenize(FILE *fin, FILE *fout)
 {
@@ -185,7 +182,7 @@ int advance(FILE *fin, char *token)
     return TOKEN_EOF;
 }
 
-int isSymbol(char c)
+static int isSymbol(char c)
 {
     return strchr("{}()[].,;+-*/&|<>=~", c) != NULL;
 }

@@ -6,6 +6,7 @@
 #include <linux/limits.h>
 
 #include "jackTokenizer.h"
+#include "compilationEngine.h"
 
 typedef enum {
     READ_FAIL,
@@ -94,7 +95,8 @@ static int isJack(const char *fn)
 
 static void changeExt(char *fn)
 {
-    const char *outExt = "TP.xml";
+    // const char *outExt = "TP.xml";
+    const char *outExt = "P.xml";
     char *ext = strrchr(fn, '.');
 
     if (ext == NULL) {
@@ -121,7 +123,8 @@ static fileIO fileProcess(const char *infn, const char *outfn)
         return WRITE_FAIL;
     }
 
-    tokenize(fin, fout);
+    // tokenize(fin, fout);
+    compilationEngine(fin, fout);
 
     fclose(fin);
     fclose(fout);

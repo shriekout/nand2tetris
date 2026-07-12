@@ -1,3 +1,4 @@
 JackAnalyzer
 *.o
 *.d
+testDir/

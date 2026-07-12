@@ -3,7 +3,10 @@
 
 #include <stdio.h>
 
+#define BUF_MAX 256
+
 void tokenize(FILE*, FILE*);
+int advance(FILE*, char*);
 
 typedef enum {
     TOKEN_EOF = -1,
