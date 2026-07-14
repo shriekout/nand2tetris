@@ -5,9 +5,6 @@
 
 #define BUF_MAX 256
 
-void tokenize(FILE*, FILE*);
-int advance(FILE*, char*);
-
 typedef enum {
     TOKEN_EOF = -1,
     KEYWORD,
@@ -40,5 +37,11 @@ typedef enum {
     KW_NULL,
     THIS
 } keywordType;
+
+void tokenize(FILE*, FILE*);
+// Read one token.
+tokenType advance(FILE*, char*);
+// Push back one token.
+void pushBack(tokenType, const char *);
 
 #endif

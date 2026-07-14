@@ -28,6 +28,10 @@ static const char *keywordArr[] = {
     "this"
 };
 
+static tokenType prevType;
+static char prevToken[BUF_MAX];
+static int hasPrev = 0;
+
 #define KEYWORD_COUNT (sizeof(keywordArr) / sizeof(keywordArr[0]))
 
 static int isSymbol(char);
@@ -87,11 +91,17 @@ void tokenize(FILE *fin, FILE *fout)
     fprintf(fout, "%s\n", endTag);
 }
 
-int advance(FILE *fin, char *token)
+tokenType advance(FILE *fin, char *token)
 {
     int c, d;
     int prev = 0;
     int pToken = 0;
+
+    if (hasPrev) {
+        hasPrev = 0;
+        strcpy(token, prevToken);
+        return prevType;
+    }
 
     while ((c = fgetc(fin)) != EOF) {
         if (isspace(c)) {
@@ -181,6 +191,19 @@ int advance(FILE *fin, char *token)
 
     return TOKEN_EOF;
 }
+
+void pushBack(tokenType type, const char *token)
+{
+    if (hasPrev) {
+        fprintf(stderr, "pushBack(): token already exists\n");
+        return;
+    }
+
+    strcpy(prevToken, token);
+    prevType = type;
+    hasPrev = 1;
+}
+
 
 static int isSymbol(char c)
 {

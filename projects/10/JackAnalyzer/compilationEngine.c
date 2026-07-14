@@ -12,12 +12,16 @@ static void compileSubroutine(FILE*, FILE*, char*);
 static void compileParameterList(FILE*, FILE*, char*);
 static void compileSubroutineBody(FILE*, FILE*, char*);
 static void compileVarDec(FILE*, FILE*, char*);
+static void compileStatements(FILE*, FILE*, char*);
 static void compileLet(FILE*, FILE*, char*);
+static void compileIf(FILE*, FILE*, char*);
+static void compileWhile(FILE*, FILE*, char*);
 static void compileDo(FILE*, FILE*, char*);
 static void compileReturn(FILE*, FILE*, char*);
 static void compileExpression(FILE*, FILE*, char*);
 static void compileTerm(FILE*, FILE*, char*);
 static void compileExpressionList(FILE*, FILE*, char*);
+static void compileSubroutineCall(FILE*, FILE*, char*);
 
 static void xmlEscapeSymbol(char*);
 static void printSpace(FILE*);
@@ -31,6 +35,8 @@ static void compileClass(FILE *fin, FILE *fout)
 {
     tokenType type;
     char token[BUF_MAX];
+
+    countSpace = 0;
 
     if (advance(fin, token) != KEYWORD || strcmp(token, "class")) {
         fprintf(stderr, "Unknown Entry point: %s\n", token);
@@ -191,9 +197,6 @@ static void compileParameterList(FILE *fin, FILE *fout, char *token)
 static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
 {
     tokenType type;
-    int statements = 0;
-    const char *os = "<statements>";
-    const char *cs = "</statements>";
 
     printSpace(fout);
     fprintf(fout, "<subroutineBody>\n");
@@ -206,37 +209,7 @@ static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
     while ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == KEYWORD && !strcmp(token, "var")) {
             compileVarDec(fin, fout, token);
-        } else if (type == KEYWORD && !strcmp(token, "let")) {
-            if (statements == 0) {
-                statements = 1;
-                printSpace(fout);
-                fprintf(fout, "%s\n", os);
-            }
-
-            compileLet(fin, fout, token);
-        } else if (type == KEYWORD && !strcmp(token, "do")) {
-            if (statements == 0) {
-                statements = 1;
-                printSpace(fout);
-                fprintf(fout, "%s\n", os);
-            }
-
-            compileDo(fin, fout, token);
-        } else if (type == KEYWORD && !strcmp(token, "return")) {
-            if (statements == 0) {
-                statements = 1;
-                printSpace(fout);
-                fprintf(fout, "%s\n", os);
-            }
-
-            compileReturn(fin, fout, token);
         } else if (type == SYMBOL && !strcmp(token, "}")) {
-            if (statements == 1) {
-                statements = 0;
-                printSpace(fout);
-                fprintf(fout, "%s\n", cs);
-            }
-
             xmlEscapeSymbol(token);
             printSpace(fout);
             fprintf(fout, "<symbol> %s </symbol>\n", token);    // }
@@ -246,6 +219,9 @@ static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
             fprintf(fout, "</subroutineBody>\n");
 
             break;
+        } else {
+            pushBack(type, token);
+            compileStatements(fin, fout, token);
         }
     }
 }
@@ -284,7 +260,34 @@ static void compileVarDec(FILE *fin, FILE *fout, char *token)
             break;
         }
     }
+}
 
+static void compileStatements(FILE *fin, FILE *fout, char *token)
+{
+    tokenType type;
+
+    printSpace(fout);
+    fprintf(fout, "<statements>\n");
+
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == KEYWORD && !strcmp(token, "let")) {
+            compileLet(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "if")) {
+            compileIf(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "while")) {
+            compileWhile(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "do")) {
+            compileDo(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "return")) {
+            compileReturn(fin, fout, token);
+        } else if (type == SYMBOL && !strcmp(token, "}")) {
+            pushBack(type, token);
+            break;
+        }
+    }
+
+    printSpace(fout);
+    fprintf(fout, "</statements>\n");
 }
 
 static void compileLet(FILE *fin, FILE *fout, char *token)
@@ -313,16 +316,117 @@ static void compileLet(FILE *fin, FILE *fout, char *token)
 
             compileExpression(fin, fout, token);
         } else if (type == SYMBOL && !strcmp(token, ";")) {
-                xmlEscapeSymbol(token);
-                printSpace(fout);
-                fprintf(fout, "<symbol> %s </symbol>\n", token);
-                break;
+            xmlEscapeSymbol(token);
+            printSpace(fout);
+            fprintf(fout, "<symbol> %s </symbol>\n", token);
+            break;
+        } else if (type == SYMBOL && !strcmp(token, ")")) {
+            xmlEscapeSymbol(token);
+            printSpace(fout);
+            fprintf(fout, "<symbol> %s </symbol>\n", token);
         }
     }
 
     countSpace--;
     printSpace(fout);
     fprintf(fout, "</letStatement>\n");
+    countSpace--;
+}
+
+static void compileIf(FILE *fin, FILE *fout, char *token)
+{
+    tokenType type;
+
+    countSpace++;
+    printSpace(fout);
+    fprintf(fout, "<ifStatement>\n");
+
+    countSpace++;
+    printSpace(fout);
+    fprintf(fout, "<keyword> if </keyword>\n");
+
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == SYMBOL && !strcmp(token, "(")) {
+            printSpace(fout);
+            fprintf(fout,"<symbol> ( </symbol>\n");
+
+            compileExpression(fin, fout, token);
+        } else if (type == SYMBOL && !strcmp(token, ")")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> ) </symbol>\n");
+        } else if (type == SYMBOL && !strcmp(token, "{")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> { </symbol>\n");
+
+            compileStatements(fin, fout, token);
+        } else if (type == SYMBOL && !strcmp(token, "}")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> } </symbol>\n");
+
+            if ((type = advance(fin, token)) != TOKEN_EOF
+                    && !strcmp(token, "else")) {
+                pushBack(type, token);
+            } else {
+                pushBack(type, token);
+                break;
+            }
+        } else if (type == KEYWORD && !strcmp(token, "else")) {
+            printSpace(fout);
+            fprintf(fout, "<keyword> else </keyword>\n");
+        }
+    }
+
+    countSpace--;
+    printSpace(fout);
+    fprintf(fout, "</ifStatement>\n");
+
+    countSpace--;
+}
+
+static void compileWhile(FILE *fin, FILE *fout, char *token)
+{
+    tokenType type;
+
+    countSpace++;
+    printSpace(fout);
+    fprintf(fout, "<whileStatement>\n");
+
+    countSpace++;
+    printSpace(fout);
+    fprintf(fout, "<keyword> while </keyword>\n");
+
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == SYMBOL && !strcmp(token, "(")) {
+            printSpace(fout);
+            fprintf(fout,"<symbol> ( </symbol>\n");
+
+            compileExpression(fin, fout, token);
+        } else if (type == SYMBOL && !strcmp(token, ")")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> ) </symbol>\n");
+        } else if (type == SYMBOL && !strcmp(token, "{")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> { </symbol>\n");
+
+            compileStatements(fin, fout, token);
+        } else if (type == SYMBOL && !strcmp(token, "}")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> } </symbol>\n");
+
+            if ((type = advance(fin, token)) != TOKEN_EOF
+                    && !strcmp(token, "else")) {
+                pushBack(type, token);
+            } else {
+                pushBack(type, token);
+                break;
+            }
+        }
+    }
+
+    countSpace--;
+    printSpace(fout);
+    fprintf(fout, "</whileStatement>\n");
+
     countSpace--;
 }
 
@@ -365,13 +469,13 @@ static void compileDo(FILE *fin, FILE *fout, char *token)
     printSpace(fout);
     fprintf(fout, "</doStatement>\n");
     countSpace--;
-
 }
 
 static void compileReturn(FILE *fin, FILE *fout, char *token)
 {
     tokenType type;
 
+    countSpace++;
     printSpace(fout);
     fprintf(fout, "<returnStatement>\n");
 
@@ -386,6 +490,7 @@ static void compileReturn(FILE *fin, FILE *fout, char *token)
             
             break;
         } else {
+            pushBack(type, token);
             compileExpression(fin, fout, token);
         }
     }
@@ -393,6 +498,7 @@ static void compileReturn(FILE *fin, FILE *fout, char *token)
     countSpace--;
     printSpace(fout);
     fprintf(fout, "</returnStatement>\n");
+    countSpace--;
 }
 
 static void compileExpression(FILE *fin, FILE *fout, char *token)
@@ -403,10 +509,25 @@ static void compileExpression(FILE *fin, FILE *fout, char *token)
     fprintf(fout, "<expression>\n");
 
     compileTerm(fin, fout, token);
-    
+
     while ((type = advance(fin, token)) != TOKEN_EOF) {
-        if (type == SYMBOL && !strcmp(token, ";")) {
-            ungetc(token[0], fin);
+        if (type == SYMBOL 
+                && (!strcmp(token, "+") 
+                || !strcmp(token, "-") 
+                || !strcmp(token, "*") 
+                || !strcmp(token, "/") 
+                ||!strcmp(token, "&")
+                || !strcmp(token, "|") 
+                || !strcmp(token, "<") 
+                || !strcmp(token, ">") 
+                || !strcmp(token, "="))) {
+            xmlEscapeSymbol(token);
+            printSpace(fout);
+            fprintf(fout, "<symbol> %s </symbol>\n", token);
+
+            compileTerm(fin, fout, token);
+        } else {
+            pushBack(type, token);
             break;
         }
     }
@@ -423,16 +544,55 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
     printSpace(fout);
     fprintf(fout, "<term>\n");
 
-    while ((type = advance(fin, token)) != TOKEN_EOF) {
+    if ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == IDENTIFIER) {
             countSpace++;
+
             printSpace(fout);
             fprintf(fout, "<identifier> %s </identifier>\n", token);
 
+            if ((type = advance(fin, token)) != TOKEN_EOF) {
+                if (type == SYMBOL && !strcmp(token, ".")) {
+                    printSpace(fout);
+                    fprintf(fout, "<symbol> . </symbol>\n");
+                    compileSubroutineCall(fin, fout, token);
+                } else {
+                    pushBack(type, token);
+                }
+            }
+            
             countSpace--;
         } else if (type == SYMBOL && !strcmp(token, ";")) {
-            ungetc(token[0], fin);
-            break;
+            pushBack(type, token);
+        } else if (type == SYMBOL && !strcmp(token, ".")) {
+            countSpace++;
+
+            printSpace(fout);
+            fprintf(fout, "<symbol> . </symbol>\n");
+            compileSubroutineCall(fin, fout, token);
+
+            countSpace--;
+        } else if (type == KEYWORD) {
+            countSpace++;
+
+            printSpace(fout);
+            fprintf(fout, "<keyword> %s </keyword>\n", token);
+            
+            countSpace--;
+        } else if (type == STRING_CONST) {
+            countSpace++;
+
+            printSpace(fout);
+            fprintf(fout, "<stringConstant> %s </stringConstant>\n", token);
+
+            countSpace--;
+        } else if (type == INT_CONST) {
+            countSpace++;
+
+            printSpace(fout);
+            fprintf(fout, "<integerConstant> %s </integerConstant>\n", token);
+
+            countSpace--;
         }
     }
 
@@ -443,11 +603,59 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
 
 static void compileExpressionList(FILE *fin, FILE *fout, char *token)
 {
+    tokenType type;
+
     printSpace(fout);
     fprintf(fout, "<expressionList>\n");
 
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type != SYMBOL && strcmp(token, ")")) {
+            countSpace++;
+            pushBack(type, token);
+            compileExpression(fin, fout, token);
+            countSpace--;
+        } else if (type == SYMBOL && !strcmp(token, ")")) {
+            pushBack(type, token);
+            break;
+        } else if (type == SYMBOL && !strcmp(token, ",")) {
+            countSpace++;
+
+            printSpace(fout);
+            fprintf(fout, "<symbol> , </symbol>\n");
+
+            countSpace--;
+        } else if (type == IDENTIFIER) {
+            countSpace++;
+
+            pushBack(type, token);
+            compileExpression(fin, fout, token);
+            
+            countSpace--;
+        }
+    }
+
     printSpace(fout);
     fprintf(fout, "</expressionList>\n");
+}
+
+static void compileSubroutineCall(FILE *fin, FILE *fout, char *token)
+{
+    tokenType type;
+
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == IDENTIFIER) {
+            printSpace(fout);
+            fprintf(fout, "<identifier> %s </identifier>\n", token);
+        } else if (type == SYMBOL && !strcmp(token, "(")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> ( </symbol>\n");
+            compileExpressionList(fin, fout, token);
+        } else if (type == SYMBOL && !strcmp(token, ")")) {
+            printSpace(fout);
+            fprintf(fout, "<symbol> ) </symbol>\n");
+            break;
+        } 
+    }
 }
 
 static void xmlEscapeSymbol(char *symbol)
