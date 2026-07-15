@@ -95,7 +95,7 @@
             <term>
               <identifier> i </identifier>
             </term>
-          <symbol> &lt; </symbol>
+            <symbol> &lt; </symbol>
             <term>
               <identifier> length </identifier>
             </term>
@@ -106,7 +106,13 @@
             <letStatement>
               <keyword> let </keyword>
               <identifier> a </identifier>
-              <identifier> i </identifier>
+              <symbol> [ </symbol>
+              <expression>
+                <term>
+                  <identifier> i </identifier>
+                </term>
+              </expression>
+              <symbol> ] </symbol>
               <symbol> = </symbol>
               <expression>
                 <term>
@@ -134,7 +140,7 @@
                 <term>
                   <identifier> i </identifier>
                 </term>
-              <symbol> + </symbol>
+                <symbol> + </symbol>
                 <term>
                   <integerConstant> 1 </integerConstant>
                 </term>
@@ -173,7 +179,7 @@
             <term>
               <identifier> i </identifier>
             </term>
-          <symbol> &lt; </symbol>
+            <symbol> &lt; </symbol>
             <term>
               <identifier> length </identifier>
             </term>
@@ -189,12 +195,18 @@
                 <term>
                   <identifier> sum </identifier>
                 </term>
-              <symbol> + </symbol>
+                <symbol> + </symbol>
                 <term>
                   <identifier> a </identifier>
+                  <symbol> [ </symbol>
+                  <expression>
+                    <term>
+                      <identifier> i </identifier>
+                    </term>
+                  </expression>
+                  <symbol> ] </symbol>
                 </term>
               </expression>
-              <identifier> i </identifier>
               <symbol> ; </symbol>
             </letStatement>
             <letStatement>
@@ -205,7 +217,7 @@
                 <term>
                   <identifier> i </identifier>
                 </term>
-              <symbol> + </symbol>
+                <symbol> + </symbol>
                 <term>
                   <integerConstant> 1 </integerConstant>
                 </term>
@@ -242,7 +254,7 @@
               <term>
                 <identifier> sum </identifier>
               </term>
-            <symbol> / </symbol>
+              <symbol> / </symbol>
               <term>
                 <identifier> length </identifier>
               </term>
