@@ -634,7 +634,7 @@ static int isOp(const char *token)
             || !strcmp(token, "-") 
             || !strcmp(token, "*") 
             || !strcmp(token, "/") 
-            ||!strcmp(token, "&")
+            || !strcmp(token, "&")
             || !strcmp(token, "|") 
             || !strcmp(token, "<") 
             || !strcmp(token, ">") 
@@ -643,6 +643,5 @@ static int isOp(const char *token)
 
 static int isUnaryOp(const char *token)
 {
-    return !strcmp(token, "-")
-            || !strcmp(token, "~");
+    return !strcmp(token, "-") || !strcmp(token, "~");
 }
