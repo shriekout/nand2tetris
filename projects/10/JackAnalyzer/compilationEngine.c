@@ -66,12 +66,10 @@ static void compileClass(FILE *fin, FILE *fout)
         return;
     }
     
-    printToken(fout, type, token);
-
     while ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == KEYWORD 
                 && (!strcmp(token, "static")
-                || (!strcmp(token, "field")))) {
+                || !strcmp(token, "field"))) {
             compileClassVarDec(fin, fout, token);
         } else if (type == KEYWORD 
                 && (!strcmp(token, "constructor")
@@ -170,7 +168,6 @@ static void compileParameterList(FILE *fin, FILE *fout, char *token)
         } else if (type == SYMBOL && !strcmp(token, ")")) {
             countSpace--;
             closeTag(fout, "parameterList");
-            // printToken(fout, type, token);
             break;
         }
     }
@@ -181,7 +178,6 @@ static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
     tokenType type;
 
     openTag(fout, "subroutineBody");
-
 
     countSpace++;
     printToken(fout, SYMBOL, token);    // {
