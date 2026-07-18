@@ -1,0 +1,4 @@
+JackAnalyzer/
+JackCompiler
+*.o
+*.d
