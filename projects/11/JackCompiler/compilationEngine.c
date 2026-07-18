@@ -5,6 +5,7 @@
 #include "jackTokenizer.h"
 #include "compilationEngine.h"
 #include "symbolTable.h"
+#include "vmWriter.h"
 
 static char className[MAX_BUF];
 static char funcName[MAX_BUF];
@@ -18,7 +19,7 @@ static void compileVarDec(FILE*, FILE*, char*);
 // static void compileLet(FILE*, FILE*, char*);
 // static void compileIf(FILE*, FILE*, char*);
 // static void compileWhile(FILE*, FILE*, char*);
-// static void compileDo(FILE*, FILE*, char*);
+static void compileDo(FILE*, FILE*, char*);
 // static void compileReturn(FILE*, FILE*, char*);
 // static void compileExpression(FILE*, FILE*, char*);
 // static void compileTerm(FILE*, FILE*, char*);
@@ -30,6 +31,7 @@ static int isUnaryOp(const char*);
 
 void compilationEngine(FILE *fin, FILE *fout)
 {
+    initializeClassTable();
     compileClass(fin, fout);
 }
 
@@ -153,6 +155,7 @@ static void compileParameterList(FILE *fin, FILE *fout, char *token)
 static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
 {
     tokenType type;
+    char buf[MAX_BUF];
     int varCount = 0;
 
     while ((type = advance(fin, token)) != EOF) {
@@ -165,32 +168,24 @@ static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
         }
     }
 
-    // name = className + funcName;
-    // writeFunction(name, nArgs);
+    sprintf(buf, "%s.%s", className, funcName);
+    writeFunction(fout, buf, varCount);
 
-    //     tokenType type;
-
-//     openTag(fout, "statements");
-
-//     while ((type = advance(fin, token)) != TOKEN_EOF) {
-//         if (type == KEYWORD && !strcmp(token, "let")) {
-//             compileLet(fin, fout, token);
-//         } else if (type == KEYWORD && !strcmp(token, "if")) {
-//             compileIf(fin, fout, token);
-//         } else if (type == KEYWORD && !strcmp(token, "while")) {
-//             compileWhile(fin, fout, token);
-//         } else if (type == KEYWORD && !strcmp(token, "do")) {
-//             compileDo(fin, fout, token);
-//         } else if (type == KEYWORD && !strcmp(token, "return")) {
-//             compileReturn(fin, fout, token);
-//         } else if (type == SYMBOL && !strcmp(token, "}")) {
-//             pushBack(type, token);
-//             break;
-//         }
-//     }
-
-//     closeTag(fout, "statements");
-
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == KEYWORD && !strcmp(token, "let")) {
+            // compileLet(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "if")) {
+            // compileIf(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "while")) {
+            // compileWhile(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "do")) {
+            compileDo(fin, fout, token);
+        } else if (type == KEYWORD && !strcmp(token, "return")) {
+            // compileReturn(fin, fout, token);
+        } else if (type == SYMBOL && !strcmp(token, "}")) {
+            break;
+        }
+    }
 }
 
 static void compileVarDec(FILE *fin, FILE *fout, char *token)
@@ -321,15 +316,9 @@ static void compileVarDec(FILE *fin, FILE *fout, char *token)
 //     countSpace--;
 // }
 
-// static void compileDo(FILE *fin, FILE *fout, char *token)
-// {
+static void compileDo(FILE *fin, FILE *fout, char *token)
+{
 //     tokenType type;
-
-//     countSpace++;
-//     openTag(fout, "doStatement");
-
-//     countSpace++;
-//     printToken(fout, KEYWORD, token);
 
 //     while ((type = advance(fin, token)) != TOKEN_EOF) {
 //         if (type == KEYWORD) {
@@ -347,11 +336,7 @@ static void compileVarDec(FILE *fin, FILE *fout, char *token)
 //             break;
 //         }
 //     }
-
-//     countSpace--;
-//     closeTag(fout, "doStatement");
-//     countSpace--;
-// }
+}
 
 // static void compileReturn(FILE *fin, FILE *fout, char *token)
 // {

@@ -2,7 +2,7 @@ CC = gcc
 CFLAGS = -Wall -MMD -MP
 TARGET = JackCompiler
 
-SRCS = main.c jackTokenizer.c compilationEngine.c symbolTable.c
+SRCS = main.c jackTokenizer.c compilationEngine.c symbolTable.c vmWriter.c
 OBJS = $(SRCS:.c=.o)
 DEPS = $(OBJS:.o=.d)
 
