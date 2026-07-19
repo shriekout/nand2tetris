@@ -3,9 +3,11 @@
 #include "symbolTable.h"
 #include "jackTokenizer.h"
 
+#define MAX_BUF 256
+
 typedef struct {
-    char name[32];
-    char type[32];
+    char name[MAX_BUF];
+    char type[MAX_BUF];
     varKind kind;
     int index;
 } Symbol;
@@ -71,4 +73,19 @@ void initializeSubTable(void)
     subTable.count = 0;
     varCounts.argumentCount = 0;
     varCounts.varCount = 0;
+}
+
+int getVarCount(varKind kind)
+{
+    switch(kind) {
+    case k_static:   return varCounts.staticCount;
+
+    case k_field:    return varCounts.fieldCount;
+
+    case k_argument: return varCounts.argumentCount;
+
+    case k_var:      return varCounts.varCount;
+    }
+
+    return 0;
 }

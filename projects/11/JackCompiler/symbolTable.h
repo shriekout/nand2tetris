@@ -13,5 +13,6 @@ typedef enum {
 void define(char*, char*, varKind);
 void initializeClassTable(void);
 void initializeSubTable(void);
+int getVarCount(varKind);
 
 #endif

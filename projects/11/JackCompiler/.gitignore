@@ -1,4 +1,5 @@
 JackAnalyzer/
 JackCompiler
+testDir/
 *.o
 *.d
