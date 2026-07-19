@@ -16,7 +16,7 @@ static void compileParameterList(FILE*, FILE*, char*);
 static void compileSubroutineBody(FILE*, FILE*, char*);
 static void compileVarDec(FILE*, FILE*, char*);
 static void compileStatements(FILE*, FILE*, char*);
-// static void compileLet(FILE*, FILE*, char*);
+static void compileLet(FILE*, FILE*, char*);
 // static void compileIf(FILE*, FILE*, char*);
 // static void compileWhile(FILE*, FILE*, char*);
 static void compileDo(FILE*, FILE*, char*);
@@ -177,7 +177,21 @@ static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
 
 static void compileVarDec(FILE *fin, FILE *fout, char *token)
 {
-//     compileClassVarDec(fin, fout, token);
+    tokenType type;
+    char t[MAX_BUF];
+
+    advance(fin, token);
+    strcpy(t, token);
+
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == SYMBOL && !strcmp(token, ",")) {
+            continue;
+        } else if (type == IDENTIFIER) {
+            define(token, t, k_var);
+        } else if (type == SYMBOL && !strcmp(token, ";")) {
+            break;
+        }
+    }
 }
 
 static void compileStatements(FILE *fin, FILE *fout, char *token)
@@ -186,7 +200,7 @@ static void compileStatements(FILE *fin, FILE *fout, char *token)
 
     while ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == KEYWORD && !strcmp(token, "let")) {
-            // compileLet(fin, fout, token);
+            compileLet(fin, fout, token);
         } else if (type == KEYWORD && !strcmp(token, "if")) {
             // compileIf(fin, fout, token);
         } else if (type == KEYWORD && !strcmp(token, "while")) {
@@ -202,15 +216,9 @@ static void compileStatements(FILE *fin, FILE *fout, char *token)
     }
 }
 
-// static void compileLet(FILE *fin, FILE *fout, char *token)
-// {
+static void compileLet(FILE *fin, FILE *fout, char *token)
+{
 //     tokenType type;
-
-//     countSpace++;
-//     openTag(fout, "letStatement");
-
-//     countSpace++;
-//     printToken(fout, KEYWORD, token);
 
 //     while ((type = advance(fin, token)) != TOKEN_EOF) {
 //         if (type == KEYWORD) {
@@ -243,11 +251,7 @@ static void compileStatements(FILE *fin, FILE *fout, char *token)
 //             printToken(fout, type, token);
 //         }
 //     }
-
-//     countSpace--;
-//     closeTag(fout, "letStatement");
-//     countSpace--;
-// }
+}
 
 // static void compileIf(FILE *fin, FILE *fout, char *token)
 // {
@@ -390,6 +394,9 @@ static void compileExpression(FILE *fin, FILE *fout, char *token)
         } else if (type == SYMBOL && !strcmp(token, ")")) {
             pushBack(type, token);
             break;
+        } else {
+            pushBack(type, token);
+            break;
         }
     }
 }
@@ -397,6 +404,7 @@ static void compileExpression(FILE *fin, FILE *fout, char *token)
 static void compileTerm(FILE *fin, FILE *fout, char *token)
 {
     tokenType type;
+    arithmetic op;
 
     if ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == SYMBOL && !strcmp(token, ")")) {
@@ -406,7 +414,18 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
             advance(fin, token);    // )
         } else if (type == INT_CONST) {
             writePush(fout, CONSTANT, atoi(token));
+        } else if (type == SYMBOL && isUnaryOp(token)) {
+            if (!strcmp(token, "~")) {
+                op = NOT;
+            } else if (!strcmp(token, "-")) {
+                op = NEG;
+            }
+            
+            compileTerm(fin, fout, token);
+            writeArithmetic(fout, op);
         }
+    }
+}
 //         if (type == IDENTIFIER) {
 //             countSpace++;
 //             printToken(fout, type, token);
@@ -470,8 +489,8 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
 //             countSpace--;
 //             compileTerm(fin, fout, token);
 //         }
-    }
-}
+//     }
+// }
 
 static int compileExpressionList(FILE *fin, FILE *fout, char *token)
 {
