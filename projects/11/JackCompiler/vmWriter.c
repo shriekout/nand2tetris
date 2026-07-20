@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include "vmWriter.h"
+#include "types.h"
 
 void writePush(FILE *fout, segment seg, int idx)
 {
@@ -25,6 +26,7 @@ void writePop(FILE *fout, segment seg, int idx)
     char *s;
 
     switch (seg) {
+        case CONSTANT:  break;
         case ARGUMENT:  s = "argument";    break;
         case LOCAL:     s = "local";       break;
         case STATIC:    s = "static";      break;
@@ -61,17 +63,17 @@ void writeArithmetic(FILE *fout, arithmetic cmd)
 
 void writeLabel(FILE *fout, char *label)
 {
-
+    fprintf(fout, "label %s\n", label);
 }
 
 void writeGoto(FILE *fout, char *label)
 {
-
+    fprintf(fout, "goto %s\n", label);
 }
 
 void writeIf(FILE *fout, char *label)
 {
-
+    fprintf(fout, "if-goto %s\n", label);
 }
 
 void writeCall(FILE *fout, char *name, int nArgs)
@@ -82,7 +84,7 @@ void writeCall(FILE *fout, char *name, int nArgs)
 
 void writeFunction(FILE *fout, char *name, int nVars)
 {
-    fprintf(fout, "function %s %d\n", name , nVars);
+    fprintf(fout, "\nfunction %s %d\n", name , nVars);
 }
 
 void writeReturn(FILE *fout)

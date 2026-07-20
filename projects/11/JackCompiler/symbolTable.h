@@ -1,18 +1,14 @@
 #ifndef SYMBOLTABLE_H
 #define SYMBOLTABLE_H
 
-#define MAX_SYMBOLS 256
-
-typedef enum {
-    k_static,
-    k_field,
-    k_argument,
-    k_var,
-} varKind;
+#include "types.h"
 
 void define(char*, char*, varKind);
 void initializeClassTable(void);
 void initializeSubTable(void);
 int getVarCount(varKind);
+varKind kindOf(char*);
+char *typeOf(char*);
+int indexOf(char*);
 
 #endif

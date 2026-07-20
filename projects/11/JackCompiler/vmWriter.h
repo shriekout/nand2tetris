@@ -3,32 +3,7 @@
 
 #include <stdio.h>
 
-#define MAX_BUF 256
-
-typedef enum {
-    CONSTANT,
-    ARGUMENT,
-    LOCAL,
-    STATIC,
-    THIS,
-    THAT,
-    POINTER,
-    TEMP,
-} segment;
-
-typedef enum {
-    ADD,
-    SUB,
-    MUL,
-    DIV,
-    NEG,
-    EQ,
-    GT,
-    LT,
-    AND,
-    OR,
-    NOT,
-} arithmetic;
+#include "types.h"
 
 void writePush(FILE*, segment, int);
 void writePop(FILE*, segment, int);

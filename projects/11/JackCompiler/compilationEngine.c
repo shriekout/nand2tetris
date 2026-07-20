@@ -9,6 +9,8 @@
 
 static char className[MAX_BUF];
 static char funcName[MAX_BUF];
+static int loopNum = 0;
+
 static void compileClass(FILE*, FILE*);
 static void compileClassVarDec(FILE*, FILE*, char*);
 static void compileSubroutine(FILE*, FILE*, char*);
@@ -17,8 +19,8 @@ static void compileSubroutineBody(FILE*, FILE*, char*);
 static void compileVarDec(FILE*, FILE*, char*);
 static void compileStatements(FILE*, FILE*, char*);
 static void compileLet(FILE*, FILE*, char*);
-// static void compileIf(FILE*, FILE*, char*);
-// static void compileWhile(FILE*, FILE*, char*);
+static void compileIf(FILE*, FILE*, char*);
+static void compileWhile(FILE*, FILE*, char*);
 static void compileDo(FILE*, FILE*, char*);
 static void compileReturn(FILE*, FILE*, char*);
 static void compileExpression(FILE*, FILE*, char*);
@@ -28,6 +30,7 @@ static void compileSubroutineCall(FILE*, FILE*, char*);
 
 static int isOp(const char*);
 static int isUnaryOp(const char*);
+static segment varKindToSegment(varKind);
 
 void compilationEngine(FILE *fin, FILE *fout)
 {
@@ -131,25 +134,25 @@ static void compileSubroutine(FILE *fin, FILE *fout, char *token)
 
 static void compileParameterList(FILE *fin, FILE *fout, char *token)
 {
-//     tokenType type;
+    tokenType type;
+    char name[MAX_BUF];
+    char t[MAX_BUF];
 
-//     openTag(fout, "parameterList");
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == SYMBOL && !strcmp(token, ",")) {
+            continue;
+        } else if (type == SYMBOL && !strcmp(token, ")")) {
+            pushBack(type, token);
+            break;
+        } else {
+            strcpy(t, token);
 
-//     countSpace++;
+            advance(fin, token);
+            strcpy(name, token);
 
-//     while ((type = advance(fin, token)) != TOKEN_EOF) {
-//         if (type == KEYWORD) {
-//             printToken(fout, type, token);
-//         } else if (type == IDENTIFIER) {
-//             printToken(fout, type, token);
-//         } else if (type == SYMBOL && !strcmp(token, ",")) {
-//             printToken(fout, type, token);
-//         } else if (type == SYMBOL && !strcmp(token, ")")) {
-//             countSpace--;
-//             closeTag(fout, "parameterList");
-//             break;
-//         }
-//     }
+            define(name, t, k_argument);
+        }
+    }
 }
 
 static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
@@ -202,9 +205,9 @@ static void compileStatements(FILE *fin, FILE *fout, char *token)
         if (type == KEYWORD && !strcmp(token, "let")) {
             compileLet(fin, fout, token);
         } else if (type == KEYWORD && !strcmp(token, "if")) {
-            // compileIf(fin, fout, token);
+            compileIf(fin, fout, token);
         } else if (type == KEYWORD && !strcmp(token, "while")) {
-            // compileWhile(fin, fout, token);
+            compileWhile(fin, fout, token);
         } else if (type == KEYWORD && !strcmp(token, "do")) {
             compileDo(fin, fout, token);
         } else if (type == KEYWORD && !strcmp(token, "return")) {
@@ -218,43 +221,22 @@ static void compileStatements(FILE *fin, FILE *fout, char *token)
 
 static void compileLet(FILE *fin, FILE *fout, char *token)
 {
-//     tokenType type;
+    char varName[MAX_BUF];
 
-//     while ((type = advance(fin, token)) != TOKEN_EOF) {
-//         if (type == KEYWORD) {
-//             printToken(fout, type, token);
-//         } else if (type == IDENTIFIER) {
-//             printToken(fout, type, token);
+    advance(fin, token);    // Read variable name
+    strcpy(varName, token);
 
-//             if ((type = advance(fin, token)) == SYMBOL &&
-//                 !strcmp(token, "[")) {
-//                 printToken(fout, type, token);
-//                 compileExpression(fin, fout, token);
+    advance(fin, token);    // Read "="
 
-//                 if ((type = advance(fin, token)) == SYMBOL &&
-//                     !strcmp(token, "]")) {
-//                     printToken(fout, type, token);
-//                 } else {
-//                     perror("Expected ]");
-//                     exit(1);
-//                 }
-//             } else {
-//                 pushBack(type, token);
-//             }
-//         } else if (type == SYMBOL && !strcmp(token, "=")) {
-//             printToken(fout, type, token);
-//             compileExpression(fin, fout, token);
-//         } else if (type == SYMBOL && !strcmp(token, ";")) {
-//             printToken(fout, type, token);
-//             break;
-//         } else if (type == SYMBOL && !strcmp(token, ")")) {
-//             printToken(fout, type, token);
-//         }
-//     }
+    compileExpression(fin, fout, token);
+
+    writePop(fout, varKindToSegment(kindOf(varName)), indexOf(varName));
 }
 
-// static void compileIf(FILE *fin, FILE *fout, char *token)
-// {
+static void compileIf(FILE *fin, FILE *fout, char *token)
+{
+
+}
 //     tokenType type;
 
 //     countSpace++;
@@ -292,45 +274,41 @@ static void compileLet(FILE *fin, FILE *fout, char *token)
 //     countSpace--;
 // }
 
-// static void compileWhile(FILE *fin, FILE *fout, char *token)
-// {
-//     tokenType type;
+static void compileWhile(FILE *fin, FILE *fout, char *token)
+{
+    char buf1[MAX_BUF], buf2[MAX_BUF];
+    int n = loopNum++;
 
-//     countSpace++;
-//     openTag(fout, "whileStatement");
+    sprintf(buf1, "WHILE_EXP%d", n);
+    sprintf(buf2, "WHILE_END%d", n);
+    
 
-//     countSpace++;
-//     printToken(fout, KEYWORD, token);
+    advance(fin, token);    // Read "("
 
-//     while ((type = advance(fin, token)) != TOKEN_EOF) {
-//         if (type == SYMBOL && !strcmp(token, "(")) {
-//             printToken(fout, type, token);
-//             compileExpression(fin, fout, token);
-//         } else if (type == SYMBOL && !strcmp(token, ")")) {
-//             printToken(fout, type, token);
-//         } else if (type == SYMBOL && !strcmp(token, "{")) {
-//             printToken(fout, type, token);
-//             compileStatements(fin, fout, token);
-//         } else if (type == SYMBOL && !strcmp(token, "}")) {
-//             printToken(fout, type, token);
+    writeLabel(fout, buf1);
 
-//             if ((type = advance(fin, token)) != TOKEN_EOF
-//                     && !strcmp(token, "else")) {
-//                 pushBack(type, token);
-//             } else {
-//                 pushBack(type, token);
-//                 break;
-//             }
-//         }
-//     }
+    compileExpression(fin, fout, token);
 
-//     countSpace--;
-//     closeTag(fout, "whileStatement");
-//     countSpace--;
-// }
+    writeArithmetic(fout, NOT);
+    writeIf(fout, buf2);
+
+    advance(fin, token);    // Read ")"
+
+
+    advance(fin, token);    // Read "{"
+
+    compileStatements(fin, fout, token);
+
+    advance(fin, token);    // Read "}"
+
+    writeGoto(fout, buf1);
+    writeLabel(fout, buf2);
+}
 
 static void compileDo(FILE *fin, FILE *fout, char *token)
 {
+    advance(fin, token);
+
     compileSubroutineCall(fin, fout, token);
 
     advance(fin, token);    // ;
@@ -347,17 +325,9 @@ static void compileReturn(FILE *fin, FILE *fout, char *token)
     // return;
     if (type == SYMBOL && !strcmp(token, ";")) {
         writePush(fout, CONSTANT, 0);
-        writeReturn(fout);
     }
-//     while ((type = advance(fin, token)) != TOKEN_EOF) {
-//         if (type == SYMBOL && !strcmp(token, ";")) {
-//             printToken(fout, type, token);
-//             break;
-//         } else {
-//             pushBack(type, token);
-//             compileExpression(fin, fout, token);
-//         }
-//     }
+
+    writeReturn(fout);
 }
 
 static void compileExpression(FILE *fin, FILE *fout, char *token)
@@ -405,6 +375,7 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
 {
     tokenType type;
     arithmetic op;
+    char buf[MAX_BUF];
 
     if ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == SYMBOL && !strcmp(token, ")")) {
@@ -423,6 +394,24 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
             
             compileTerm(fin, fout, token);
             writeArithmetic(fout, op);
+        } else if (type == IDENTIFIER) {
+            strcpy(buf, token);
+
+            type = advance(fin, token);
+
+            if (!strcmp(token, ".")) {
+                pushBack(type, token);
+                strcpy(token, buf);
+                compileSubroutineCall(fin, fout, token);
+            } else if (!strcmp(token, "[")) {
+
+            } else {
+                pushBack(type, token);
+                writePush(fout, varKindToSegment(kindOf(buf)), indexOf(buf));
+            }
+        } else if (type == KEYWORD && !strcmp(token, "true")) {
+            writePush(fout, CONSTANT, 0);
+            writeArithmetic(fout, NOT);
         }
     }
 }
@@ -501,9 +490,7 @@ static int compileExpressionList(FILE *fin, FILE *fout, char *token)
         if (type == SYMBOL && !strcmp(token, ")")) {
             pushBack(type, token);
             break;
-        }
-
-        if (type == SYMBOL && !strcmp(token, ",")) {
+        } else if (type == SYMBOL && !strcmp(token, ",")) {
             continue;
         }
 
@@ -521,7 +508,6 @@ static void compileSubroutineCall(FILE *fin, FILE *fout, char *token)
     char buf[MAX_BUF];
     int nArgs;
 
-    advance(fin, token);    // identifier
     strcpy(buf, token);
 
     if ((type = advance(fin, token)) == SYMBOL && !strcmp(token, ".")) {
@@ -556,4 +542,17 @@ static int isOp(const char *token)
 static int isUnaryOp(const char *token)
 {
     return !strcmp(token, "-") || !strcmp(token, "~");
+}
+
+static segment varKindToSegment(varKind kind)
+{
+    switch (kind) {
+        case k_none:        return -1;
+        case k_static:      return STATIC;
+        case k_field:       return THIS;
+        case k_argument:    return ARGUMENT;
+        case k_var:         return LOCAL;
+    }
+
+    return -1;
 }

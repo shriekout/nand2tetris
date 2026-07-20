@@ -1,9 +1,8 @@
 #include <string.h>
 
 #include "symbolTable.h"
-#include "jackTokenizer.h"
 
-#define MAX_BUF 256
+#define MAX_SYMBOLS 256
 
 typedef struct {
     char name[MAX_BUF];
@@ -26,6 +25,8 @@ static struct VarCounts {
 
 static SymbolTable classTable;
 static SymbolTable subTable;
+
+static Symbol *findSymbol(char *);
 
 void define(char *name, char *type, varKind kind)
 {
@@ -88,4 +89,39 @@ int getVarCount(varKind kind)
     }
 
     return 0;
+}
+
+varKind kindOf(char *name)
+{
+    Symbol *p = findSymbol(name);
+    return p ? p->kind : k_none;
+}
+
+char *typeOf(char *name)
+{
+    Symbol *p = findSymbol(name);
+    return p ? p->type : NULL;
+}
+
+int indexOf(char *name)
+{
+    Symbol *p = findSymbol(name);
+    return p ? p->index : -1;
+}
+
+static Symbol *findSymbol(char *name)
+{
+        for (int i = 0; i < subTable.count; i++) {
+        if (!strcmp(name, subTable.table[i].name)) {
+            return &subTable.table[i];
+        }
+    }
+
+    for (int i = 0; i < classTable.count; i++) {
+        if (!strcmp(name, classTable.table[i].name)) {
+            return &classTable.table[i];
+        }
+    }
+
+    return NULL;
 }
