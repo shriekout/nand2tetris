@@ -84,7 +84,7 @@ void writeCall(FILE *fout, char *name, int nArgs)
 
 void writeFunction(FILE *fout, char *name, int nVars)
 {
-    fprintf(fout, "\nfunction %s %d\n", name , nVars);
+    fprintf(fout, "function %s %d\n", name , nVars);
 }
 
 void writeReturn(FILE *fout)

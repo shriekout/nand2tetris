@@ -235,44 +235,45 @@ static void compileLet(FILE *fin, FILE *fout, char *token)
 
 static void compileIf(FILE *fin, FILE *fout, char *token)
 {
+    tokenType type;
+    char buf1[MAX_BUF], buf2[MAX_BUF];
+    int n = loopNum++;
 
+    sprintf(buf1, "IF_FALSE%d", n);
+    sprintf(buf2, "IF_END%d", n);
+
+    advance(fin, token);    // Read "("
+
+    compileExpression(fin, fout, token);
+    writeArithmetic(fout, NOT);
+
+    writeIf(fout, buf1);
+
+    advance(fin, token);    // Read ")"
+
+    advance(fin, token);    // Read "{"
+
+    compileStatements(fin, fout, token);
+
+    advance(fin, token);    // Read "}"
+
+    writeGoto(fout, buf2);
+    writeLabel(fout, buf1);
+
+    type = advance(fin, token);
+
+    if (type == KEYWORD && !strcmp(token, "else")) {
+        advance(fin, token);    // Read "{"
+
+        compileStatements(fin, fout, token);
+
+        advance(fin, token);    // Read "}"
+    } else {
+        pushBack(type, token);
+    }
+
+    writeLabel(fout, buf2);
 }
-//     tokenType type;
-
-//     countSpace++;
-//     openTag(fout, "ifStatement");
-
-//     countSpace++;
-//     printToken(fout, KEYWORD, token);
-
-//     while ((type = advance(fin, token)) != TOKEN_EOF) {
-//         if (type == SYMBOL && !strcmp(token, "(")) {
-//             printToken(fout, type, token);
-//             compileExpression(fin, fout, token);
-//         } else if (type == SYMBOL && !strcmp(token, ")")) {
-//             printToken(fout, type, token);
-//         } else if (type == SYMBOL && !strcmp(token, "{")) {
-//             printToken(fout, type, token);
-//             compileStatements(fin, fout, token);
-//         } else if (type == SYMBOL && !strcmp(token, "}")) {
-//             printToken(fout, type, token);
-
-//             if ((type = advance(fin, token)) != TOKEN_EOF
-//                     && !strcmp(token, "else")) {
-//                 pushBack(type, token);
-//             } else {
-//                 pushBack(type, token);
-//                 break;
-//             }
-//         } else if (type == KEYWORD && !strcmp(token, "else")) {
-//             printToken(fout, type, token);
-//         }
-//     }
-
-//     countSpace--;
-//     closeTag(fout, "ifStatement");
-//     countSpace--;
-// }
 
 static void compileWhile(FILE *fin, FILE *fout, char *token)
 {
@@ -325,6 +326,9 @@ static void compileReturn(FILE *fin, FILE *fout, char *token)
     // return;
     if (type == SYMBOL && !strcmp(token, ";")) {
         writePush(fout, CONSTANT, 0);
+    } else {
+        pushBack(type, token);
+        compileExpression(fin, fout, token);
     }
 
     writeReturn(fout);
@@ -412,6 +416,8 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
         } else if (type == KEYWORD && !strcmp(token, "true")) {
             writePush(fout, CONSTANT, 0);
             writeArithmetic(fout, NOT);
+        } else if (type == KEYWORD && !strcmp(token, "false")) {
+            writePush(fout, CONSTANT, 0);
         }
     }
 }
