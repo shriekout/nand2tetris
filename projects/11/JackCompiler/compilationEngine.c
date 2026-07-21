@@ -386,6 +386,7 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
     tokenType type;
     arithmetic op;
     char buf[MAX_BUF];
+    char c;
 
     if ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == SYMBOL && !strcmp(token, ")")) {
@@ -404,6 +405,14 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
             
             compileTerm(fin, fout, token);
             writeArithmetic(fout, op);
+        } else if (type == STRING_CONST) {
+            int len = strlen(token);
+            char *p = token;
+
+            while (*p != '\0') {
+
+                p++;
+            }
         } else if (type == IDENTIFIER) {
             strcpy(buf, token);
 
