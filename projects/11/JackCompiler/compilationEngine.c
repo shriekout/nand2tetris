@@ -10,6 +10,8 @@
 static char className[MAX_BUF];
 static char funcName[MAX_BUF];
 static int loopNum = 0;
+static int isConstructor = 0;
+static int isMethod = 0;
 
 static void compileClass(FILE*, FILE*);
 static void compileClassVarDec(FILE*, FILE*, char*);
@@ -76,51 +78,46 @@ static void compileClass(FILE *fin, FILE *fout)
 
 static void compileClassVarDec(FILE *fin, FILE *fout, char *token)
 {
-//     tokenType type;
-//     int isVar = !strcmp(token, "var");
+    tokenType type;
+    varKind k;
+    char t[MAX_BUF];
 
-//     if (isVar) {
-//         openTag(fout, "varDec");
-//     } else {
-//         openTag(fout, "classVarDec");
-//     }
+    if (!strcmp(token, "static"))
+        k = k_static;
+    else
+        k = k_field;
 
-//     countSpace++;
-//     printToken(fout, KEYWORD, token);
+    advance(fin, token);    // Read type
+    strcpy(t, token);
 
-//     while ((type = advance(fin, token)) != TOKEN_EOF) {
-//         if (type == KEYWORD) {
-//             printToken(fout, type, token);
-//         } else if (type == IDENTIFIER) {
-//             printToken(fout, type, token);
-//         } else if (type == SYMBOL && strcmp(token, ";")) {
-//             printToken(fout, type, token);
-//         } else if (type == SYMBOL && !strcmp(token, ";")) {
-//             printToken(fout, type, token);
-//             countSpace--;
-
-//             if (isVar) {
-//                 closeTag(fout, "varDec");
-//             } else {
-//                 closeTag(fout, "classVarDec");
-//             }
-
-//             break;
-//         }
-//     }
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
+        if (type == SYMBOL && !strcmp(token, ",")) {
+            continue;
+        } else if (type == IDENTIFIER) {
+            define(token, t, k);
+        } else if (type == SYMBOL && !strcmp(token, ";")) {
+            break;
+        }
+    }
 }
 
 static void compileSubroutine(FILE *fin, FILE *fout, char *token)
 {
+    isConstructor = 0;
+    isMethod = 0;
+
     initializeSubTable();
 
     if (!strcmp(token, "method")) {
         define("this", className, k_argument);
+        isMethod = 1;
+    } else if (!strcmp(token, "constructor")) {
+        isConstructor = 1;
     }
 
     advance(fin, token);    // "void"? "int"? ...?
 
-    advance(fin, token);    // Read function name. con? meth?
+    advance(fin, token);    // Read function(constructor? method?) name
     strcpy(funcName, token);
 
     advance(fin, token);    // (
@@ -161,7 +158,7 @@ static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
     char buf[MAX_BUF];
 
     advance(fin, token);    // {
-    while ((type = advance(fin, token)) != EOF) {
+    while ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == KEYWORD && !strcmp(token, "var")) {
             compileVarDec(fin, fout, token);
         } else {
@@ -172,6 +169,15 @@ static void compileSubroutineBody(FILE *fin, FILE *fout, char *token)
 
     sprintf(buf, "%s.%s", className, funcName);
     writeFunction(fout, buf, getVarCount(k_var));
+
+    if (isConstructor) {
+        writePush(fout, CONSTANT, getVarCount(k_field));
+        writeCall(fout, "Memory.alloc", 1);
+        writePop(fout, POINTER, 0);
+    } else if (isMethod) {
+        writePush(fout, ARGUMENT, 0);
+        writePop(fout, POINTER, 0);
+    }
 
     compileStatements(fin, fout, token);
 
@@ -418,6 +424,8 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
             writeArithmetic(fout, NOT);
         } else if (type == KEYWORD && !strcmp(token, "false")) {
             writePush(fout, CONSTANT, 0);
+        } else if (type == KEYWORD && !strcmp(token, "this")) {
+            writePush(fout, POINTER, 0);
         }
     }
 }
@@ -513,8 +521,15 @@ static void compileSubroutineCall(FILE *fin, FILE *fout, char *token)
     tokenType type;
     char buf[MAX_BUF];
     int nArgs;
+    int isMedthod = 0;
 
     strcpy(buf, token);
+
+    if (indexOf(buf) != -1) {
+        writePush(fout, varKindToSegment(kindOf(buf)), indexOf(buf));
+        strcpy(buf, typeOf(buf));
+        isMedthod = 1;
+    }
 
     if ((type = advance(fin, token)) == SYMBOL && !strcmp(token, ".")) {
         strcat(buf, token);     // .
@@ -526,6 +541,7 @@ static void compileSubroutineCall(FILE *fin, FILE *fout, char *token)
     advance(fin, token);        // (
 
     nArgs = compileExpressionList(fin, fout, token);
+    nArgs += isMedthod;
 
     advance(fin, token);        // )
 

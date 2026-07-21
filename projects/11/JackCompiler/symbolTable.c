@@ -42,6 +42,9 @@ void define(char *name, char *type, varKind kind)
     p->table[p->count].kind = kind;
 
     switch (kind) {
+        case k_none:
+            break;
+
         case k_static:
             p->table[p->count].index = varCounts.staticCount++;
             break;
@@ -79,13 +82,15 @@ void initializeSubTable(void)
 int getVarCount(varKind kind)
 {
     switch(kind) {
-    case k_static:   return varCounts.staticCount;
+        case k_none:        return 0;
 
-    case k_field:    return varCounts.fieldCount;
+        case k_static:      return varCounts.staticCount;
 
-    case k_argument: return varCounts.argumentCount;
+        case k_field:       return varCounts.fieldCount;
 
-    case k_var:      return varCounts.varCount;
+        case k_argument:    return varCounts.argumentCount;
+
+        case k_var:         return varCounts.varCount;
     }
 
     return 0;
