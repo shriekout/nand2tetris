@@ -227,16 +227,30 @@ static void compileStatements(FILE *fin, FILE *fout, char *token)
 
 static void compileLet(FILE *fin, FILE *fout, char *token)
 {
+    tokenType type;
     char varName[MAX_BUF];
 
     advance(fin, token);    // Read variable name
     strcpy(varName, token);
 
-    advance(fin, token);    // Read "="
+    if ((type = advance(fin, token)) == SYMBOL && !strcmp(token, "[")) {
+        writePush(fout, varKindToSegment(kindOf(varName)), indexOf(varName));
+        compileExpression(fin, fout, token);
+        advance(fin, token);    // Consume "]"
+        writeArithmetic(fout, ADD);
 
-    compileExpression(fin, fout, token);
+        advance(fin, token);    // Consume "="
 
-    writePop(fout, varKindToSegment(kindOf(varName)), indexOf(varName));
+        compileExpression(fin, fout, token);
+
+        writePop(fout, TEMP, 0);
+        writePop(fout, POINTER, 1);
+        writePush(fout, TEMP, 0);
+        writePop(fout, THAT, 0);
+    } else {
+        compileExpression(fin, fout, token);
+        writePop(fout, varKindToSegment(kindOf(varName)), indexOf(varName));
+    }
 }
 
 static void compileIf(FILE *fin, FILE *fout, char *token)
@@ -386,7 +400,6 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
     tokenType type;
     arithmetic op;
     char buf[MAX_BUF];
-    char c;
 
     if ((type = advance(fin, token)) != TOKEN_EOF) {
         if (type == SYMBOL && !strcmp(token, ")")) {
@@ -409,8 +422,12 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
             int len = strlen(token);
             char *p = token;
 
-            while (*p != '\0') {
+            writePush(fout, CONSTANT, len);
+            writeCall(fout, "String.new", 1);
 
+            while (*p != '\0') {
+                writePush(fout, CONSTANT, (unsigned char)*p);
+                writeCall(fout, "String.appendChar", 2);
                 p++;
             }
         } else if (type == IDENTIFIER) {
@@ -423,7 +440,13 @@ static void compileTerm(FILE *fin, FILE *fout, char *token)
                 strcpy(token, buf);
                 compileSubroutineCall(fin, fout, token);
             } else if (!strcmp(token, "[")) {
+                writePush(fout, varKindToSegment(kindOf(buf)), indexOf(buf));
+                compileExpression(fin, fout, token);
+                advance(fin, token);            // Consume "]"
 
+                writeArithmetic(fout, ADD);
+                writePop(fout, POINTER, 1);
+                writePush(fout, THAT, 0);
             } else {
                 pushBack(type, token);
                 writePush(fout, varKindToSegment(kindOf(buf)), indexOf(buf));
